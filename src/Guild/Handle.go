@@ -2,6 +2,7 @@ package Guild
 
 import (
 	"antegr.al/chatanium-bot/v1/src/Handlers"
+	Internal "antegr.al/chatanium-bot/v1/src/Internals"
 	"antegr.al/chatanium-bot/v1/src/Log"
 	"antegr.al/chatanium-bot/v1/src/Schema"
 	"github.com/bwmarrin/discordgo"
@@ -31,13 +32,19 @@ func Handle(client *discordgo.Session) {
 		GuildCmds = append(GuildCmds, Guild)
 	})
 
-	// Handle all messages from all guilds
-	client.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
-		// Ignore all messages created by the bot itself
-		if m.Author.ID == client.State.User.ID {
-			return
-		}
+	// Remove all commands from left guilds
+	client.AddHandler(func(s *discordgo.Session, g *discordgo.GuildDelete) {
+		Log.Verbose.Printf("Left Guild: %v (%v)", g.Name, g.ID)
 
-		Log.Verbose.Printf("(%v -> %v) %v: %v", m.GuildID, m.ChannelID, m.Author, m.Content)
+		for i, v := range GuildCmds {
+			if v.GuildID == g.ID {
+				v.RemoveSchema()
+				GuildCmds = append(GuildCmds[:i], GuildCmds[i+1:]...)
+				break
+			}
+		}
 	})
+
+	Internal.MemberLogger(client)
+	Internal.MessageLogger(client)
 }

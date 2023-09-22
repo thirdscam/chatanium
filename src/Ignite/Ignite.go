@@ -19,7 +19,11 @@ func Discord(singal chan os.Signal, client *discordgo.Session) {
 
 	// Getting Token infomation
 	client.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
-		Log.Info.Printf("Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)
+		Log.Verbose.Printf("WS/READY > Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)
+	})
+
+	client.AddHandler(func(s *discordgo.Session, r *discordgo.GuildDelete) {
+		Log.Verbose.Printf("WS/READY > Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)
 	})
 
 	// Handle all guilds
