@@ -7,6 +7,7 @@ import (
 	"os/signal"
 
 	"antegr.al/chatanium-bot/v1/src/Guild"
+	"antegr.al/chatanium-bot/v1/src/Ignite"
 	"antegr.al/chatanium-bot/v1/src/Log"
 	"github.com/bwmarrin/discordgo"
 )
@@ -20,29 +21,34 @@ func main() {
 	flag.StringVar(&Token, "token", "", "Address to proxy")
 	flag.IntVar(&LoggingMode, "logging-mode", 3, "Logging mode")
 
+	// Parse the flags and init the logger
+	flag.Parse()
+	Log.Init(LoggingMode)
+
+	// Create the session and the registered commands list
 	client := getClient("MTE1NDc4NTkzOTM5OTM3Njk2Ng.GEwjcR.Bc5uPjRJ1ceE8jtkqk3P4iLtCpbPIqx5Gq8brE")
 	var RegisteredGuildCmds *[]Guild.Commands
 
+	// Create a channel to receive OS signals
 	stop := make(chan os.Signal)
-	go start(stop, client, RegisteredGuildCmds)
-	go shutdown(stop, client, RegisteredGuildCmds)
 
+	// Ignite Server (Discord, RESTful, etc.)
+	go Ignite.Discord(stop, client, RegisteredGuildCmds)
+
+	// Wait for a signal to shutdown
 	log.Println("Press Ctrl+C to shutdown")
 	<-stop
+	shutdown(stop, client, RegisteredGuildCmds)
 }
 
-func start(singal chan os.Signal, client *discordgo.Session, RegisteredGuildCmds *[]Guild.Commands) {
-	Log.Info.Println("Starting Bot...")
-
-	singal <- os.Interrupt
-}
-
-func shutdown(Singal chan os.Signal, client *discordgo.Session, RegisteredGuildCmds *[]Guild.Commands) {
+func shutdown(Singal chan os.Signal, Client *discordgo.Session, RegisteredGuildCmds *[]Guild.Commands) {
 	Log.Info.Println("Shutting down...")
 
-	// Remove all commands from all guilds
-	for _, v := range *RegisteredGuildCmds {
-		v.RemoveSchema()
+	if RegisteredGuildCmds != nil {
+		// Remove all commands from all guilds
+		for _, v := range *RegisteredGuildCmds {
+			v.RemoveSchema()
+		}
 	}
 
 	// Close the client
