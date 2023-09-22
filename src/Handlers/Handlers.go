@@ -8,3 +8,19 @@ func GetAll() map[string]func(s *discordgo.Session, i *discordgo.InteractionCrea
 		"ping": HandlePing,
 	}
 }
+
+func GetAllowedOnly(AllowedModules []string) map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	result := make(map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate))
+	AllHandlers := GetAll()
+
+	for _, v := range AllowedModules {
+		for name, fn := range AllHandlers {
+			if name == v {
+				result[v] = fn
+				break
+			}
+		}
+	}
+
+	return result
+}

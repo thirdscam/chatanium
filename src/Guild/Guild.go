@@ -13,7 +13,7 @@ type Commands struct {
 }
 
 func (t *Commands) RegisterHandlers() {
-	Log.Info.Printf("%s: Adding handlers...", t.GuildID)
+	Log.Verbose.Printf("%s > Adding handlers...", t.GuildID)
 	t.Client.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if h, ok := t.Handlers[i.ApplicationCommandData().Name]; ok {
 			h(s, i)
@@ -21,8 +21,8 @@ func (t *Commands) RegisterHandlers() {
 	})
 }
 
-func (t *Commands) RegisterSchema(Commands []*discordgo.ApplicationCommand) {
-	Log.Info.Printf("%s: Adding commands...", t.GuildID)
+func (t *Commands) RegisterSchema() {
+	Log.Verbose.Printf("%s > Adding commands...", t.GuildID)
 	registered := make([]*discordgo.ApplicationCommand, len(t.Schema))
 
 	for i, v := range t.Schema {
@@ -35,7 +35,7 @@ func (t *Commands) RegisterSchema(Commands []*discordgo.ApplicationCommand) {
 }
 
 func (t *Commands) RemoveSchema() {
-	Log.Info.Printf("%s Removing commands...", t.GuildID)
+	Log.Verbose.Printf("%s > Removing commands...", t.GuildID)
 
 	for _, v := range t.Schema {
 		err := t.Client.ApplicationCommandDelete(t.Client.State.User.ID, t.GuildID, v.ID)
