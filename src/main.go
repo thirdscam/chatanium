@@ -32,7 +32,7 @@ func main() {
 	// Create a channel to receive OS signals
 	stop := make(chan os.Signal)
 
-	// Ignite Server (Discord, RESTful, etc.)
+	// Ignite Server (Discord Bot, Status Page, etc.)
 	go Ignite.Discord(stop, client, RegisteredGuildCmds)
 
 	// Wait for a signal to shutdown
