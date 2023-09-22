@@ -1,18 +1,19 @@
-package Command
+package Guild
 
 import (
 	"antegr.al/chatanium-bot/v1/src/Log"
 	"github.com/bwmarrin/discordgo"
 )
 
-type GuildCommands struct {
+type Commands struct {
 	Schema   []*discordgo.ApplicationCommand
 	Handlers map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate)
 	Client   *discordgo.Session
 	GuildID  string
 }
 
-func (t *GuildCommands) RegisterHandlers() {
+func (t *Commands) RegisterHandlers() {
+	Log.Info.Printf("%s: Adding handlers...", t.GuildID)
 	t.Client.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if h, ok := t.Handlers[i.ApplicationCommandData().Name]; ok {
 			h(s, i)
@@ -20,7 +21,7 @@ func (t *GuildCommands) RegisterHandlers() {
 	})
 }
 
-func (t *GuildCommands) RegisterSchema(Commands []*discordgo.ApplicationCommand) {
+func (t *Commands) RegisterSchema(Commands []*discordgo.ApplicationCommand) {
 	Log.Info.Printf("%s: Adding commands...", t.GuildID)
 	registered := make([]*discordgo.ApplicationCommand, len(t.Schema))
 
@@ -33,7 +34,7 @@ func (t *GuildCommands) RegisterSchema(Commands []*discordgo.ApplicationCommand)
 	}
 }
 
-func (t *GuildCommands) RemoveSchema() {
+func (t *Commands) RemoveSchema() {
 	Log.Info.Printf("%s Removing commands...", t.GuildID)
 
 	for _, v := range t.Schema {
