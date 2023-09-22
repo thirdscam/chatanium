@@ -14,6 +14,7 @@ import (
 func Discord(singal chan os.Signal, client *discordgo.Session) {
 	Log.Info.Println("Starting Bot...")
 
+	// Open the connection from discord
 	if err := client.Open(); err != nil {
 		Log.Error.Fatalf("Cannot open connection: %v", err)
 	}
@@ -46,6 +47,7 @@ func Discord(singal chan os.Signal, client *discordgo.Session) {
 		GuildCmds = append(GuildCmds, Guild)
 	})
 
+	// Handle all messages from all guilds
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
 		// Ignore all messages created by the bot itself
 		if m.Author.ID == client.State.User.ID {
