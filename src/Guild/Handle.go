@@ -1,6 +1,7 @@
 package Guild
 
 import (
+	"antegr.al/chatanium-bot/v1/src/Database"
 	"antegr.al/chatanium-bot/v1/src/Handlers"
 	Internal "antegr.al/chatanium-bot/v1/src/Internal"
 	"antegr.al/chatanium-bot/v1/src/Log"
@@ -45,6 +46,12 @@ func Handle(client *discordgo.Session) {
 		}
 	})
 
-	Internal.MemberLogger(client)
-	Internal.MessageLogger(client)
+	// Database
+	Pool := &Database.Pool{}
+	Pool.Get()
+	defer Pool.Close()
+
+	// Internal Modules
+	Internal.MemberLogger(client, Pool.Conn)
+	Internal.MessageLogger(client, Pool.Conn)
 }

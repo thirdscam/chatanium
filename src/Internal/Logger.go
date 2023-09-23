@@ -3,9 +3,10 @@ package Internal
 import (
 	"antegr.al/chatanium-bot/v1/src/Log"
 	"github.com/bwmarrin/discordgo"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func MessageLogger(client *discordgo.Session) {
+func MessageLogger(client *discordgo.Session, db *pgxpool.Pool) {
 	// TODO: Database (Save Meesage, actions)
 
 	// Handle all messages from all guilds
@@ -33,7 +34,7 @@ func MessageLogger(client *discordgo.Session) {
 	})
 }
 
-func MemberLogger(client *discordgo.Session) {
+func MemberLogger(client *discordgo.Session, db *pgxpool.Pool) {
 	// TODO: Database (Save Meesage, actions)
 
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
