@@ -120,13 +120,13 @@ CREATE TABLE "public".users
 
 CREATE TABLE "public".moduleACL
 (
-    "id"             bigint NOT NULL,
-    allowed_modules  text[] NOT NULL,
-    CONSTRAINT       PK_1 PRIMARY KEY ( "id" ),
-    CONSTRAINT       FK_10_1 FOREIGN KEY ( "id" ) REFERENCES "public".channels ( "id" )
+    guild_id        bigint NOT NULL,
+    allowed_modules text[] NOT NULL,
+    CONSTRAINT      PK_1 PRIMARY KEY ( guild_id ),
+    CONSTRAINT      FK_10_1 FOREIGN KEY ( guild_id ) REFERENCES "public".guilds ( "id" )
 );
 
 CREATE INDEX FK_1 ON "public".moduleACL
 (
-    "id"
+    guild_id
 );
