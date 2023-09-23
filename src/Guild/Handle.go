@@ -2,7 +2,7 @@ package Guild
 
 import (
 	"antegr.al/chatanium-bot/v1/src/Handlers"
-	Internal "antegr.al/chatanium-bot/v1/src/Internals"
+	Internal "antegr.al/chatanium-bot/v1/src/Internal"
 	"antegr.al/chatanium-bot/v1/src/Log"
 	"antegr.al/chatanium-bot/v1/src/Schema"
 	"github.com/bwmarrin/discordgo"
@@ -16,7 +16,7 @@ func Handle(client *discordgo.Session) {
 	client.AddHandler(func(s *discordgo.Session, g *discordgo.GuildCreate) {
 		Log.Verbose.Printf("Joined Guild: %v (%v)", g.Name, g.ID)
 
-		AllowedModules := []string{"ping"}
+		AllowedModules := GetModulesByACL(g.ID)
 
 		Guild := Commands{
 			Schema:   Schema.GetAllowedOnly(AllowedModules),

@@ -15,7 +15,7 @@ func MessageLogger(client *discordgo.Session) {
 			return
 		}
 
-		Log.Verbose.Printf("(%v -> %v) %v: %v", m.GuildID, m.ChannelID, m.Author, m.Content)
+		Log.Verbose.Printf("MESSAGE/SEND (%v -> %v) %v: %v", m.GuildID, m.ChannelID, m.Author.Username, m.Content)
 	})
 
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.MessageUpdate) {
@@ -24,16 +24,12 @@ func MessageLogger(client *discordgo.Session) {
 			return
 		}
 
-		Log.Verbose.Printf("MESSAGE/UPDATE (%v -> %v) %v: %v", m.GuildID, m.ChannelID, m.Author, m.Content)
+		Log.Verbose.Printf("MESSAGE/UPDATE (%v -> %v / %v) %v: %v", m.GuildID, m.ChannelID, m.Message.ID, m.Author.Username, m.Content)
 	})
 
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.MessageDelete) {
-		// Ignore all messages created by the bot itself
-		if m.Author.ID == client.State.User.ID {
-			return
-		}
-
-		Log.Verbose.Printf("MESSAGE/DELETE (%v -> %v) %v: %v", m.GuildID, m.ChannelID, m.Author, m.Content)
+		// FIXME: Cannot get author
+		Log.Verbose.Printf("MESSAGE/DELETE (%v -> %v) %v", m.GuildID, m.ChannelID, m.Author)
 	})
 }
 
