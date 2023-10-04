@@ -1,3 +1,4 @@
 /logs
 __debug_bin
 .env
+/src/Database/.gitignore

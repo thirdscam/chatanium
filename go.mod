@@ -12,6 +12,8 @@ require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/puddle/v2 v2.2.1 // indirect
+	github.com/joho/godotenv v1.5.1 // indirect
+	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/steebchen/prisma-client-go v0.25.0 // indirect
 	github.com/takuoki/gocase v1.0.0 // indirect
 	golang.org/x/crypto v0.9.0 // indirect
