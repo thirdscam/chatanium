@@ -31,7 +31,7 @@ func Handle(client *discordgo.Session, db *db.PrismaClient) {
 		GuildCmd.RegisterSchema()
 
 		// Register guild in database
-		RegisterDatabase(db, g)
+		RegisterDatabase(client, db, g)
 
 		GuildCmdStorage = append(GuildCmdStorage, GuildCmd)
 	})

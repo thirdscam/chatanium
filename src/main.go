@@ -50,6 +50,7 @@ func shutdown(Singal chan os.Signal, Client *discordgo.Session, database chan *d
 	if err := Client.Close(); err != nil {
 		Log.Error.Panicf("Cannot close discord connection: %v", err)
 	}
+	Log.Verbose.Println("Discord connection closed.")
 
 	// Close the database connection
 	var dbConn *db.PrismaClient
@@ -57,6 +58,7 @@ func shutdown(Singal chan os.Signal, Client *discordgo.Session, database chan *d
 	if err := dbConn.Prisma.Disconnect(); err != nil {
 		Log.Error.Panicf("Cannot close database connection: %v", err)
 	}
+	Log.Verbose.Println("Database connection closed.")
 
 	Log.Info.Println("Successfully shutdown.")
 	os.Exit(0)
