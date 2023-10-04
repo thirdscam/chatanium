@@ -25,10 +25,7 @@ func RegisterDatabase(client *discordgo.Session, database *db.PrismaClient, g *d
 	Database.InsertUser(database, g.OwnerID, OwnerUsername)
 	InsertGuild(database, g.ID, g.Name, g.OwnerID)
 
-	Log.Verbose.Printf("%s > Guild insert completed.", g.ID)
-
 	for _, v := range g.Channels {
-		Log.Verbose.Printf("%s::%s > Channel insert completed.", g.ID, v.ID)
 		UpsertChannel(database, v.ID, g.ID, v.Name, v.Topic)
 	}
 }
@@ -56,6 +53,8 @@ func InsertGuild(database *db.PrismaClient, gid, name, ownerUid string) {
 	if err != nil {
 		Log.Error.Fatalf("Failed to insert guild: %v", err)
 	}
+
+	Log.Verbose.Printf("%s > Guild insert completed.", gid)
 }
 
 func UpsertChannel(database *db.PrismaClient, cid, gid, name, description string) {
@@ -82,6 +81,8 @@ func UpsertChannel(database *db.PrismaClient, cid, gid, name, description string
 	if err != nil {
 		Log.Error.Fatalf("Failed to upsert channel: %v", err)
 	}
+
+	Log.Verbose.Printf("%s::%s > Channel insert completed.", gid, cid)
 }
 
 // func UpsertUser(database *db.PrismaClient, uid, gid, username string) {

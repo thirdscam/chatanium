@@ -23,7 +23,7 @@ func main() {
 	flag.Parse()
 	Log.Init(LoggingMode)
 
-	Log.Info.Println("Chatanium: Scalable Bot Management System")
+	Log.Info.Println("Antegral/Chatanium: Scalable Bot Management System")
 	Log.Info.Println("Press CTRL+C to shutdown.")
 
 	// Create the session
@@ -52,6 +52,7 @@ func shutdown(Singal chan os.Signal, Client *discordgo.Session, database chan *d
 	}
 	Log.Verbose.Println("Discord connection closed.")
 
+	// FIXME:
 	// Close the database connection
 	var dbConn *db.PrismaClient
 	dbConn = <-database // Wait for the database to connect
