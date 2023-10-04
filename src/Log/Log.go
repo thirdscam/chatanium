@@ -72,6 +72,7 @@ func Init(mode int) error {
 
 	if mode >= 4 {
 		Verbose = log.New(os.Stdout, "[VERBOSE] ", log.Ldate|log.Ltime|log.Lshortfile)
+		Info.Println("Verbose logging is enabled. Only use this mode for debugging.")
 		Verbose.SetOutput(Writer)
 	}
 

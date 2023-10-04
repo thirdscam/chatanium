@@ -1,7 +1,7 @@
 package Guild
 
 import (
-	"antegr.al/chatanium-bot/v1/src/Database"
+	db "antegr.al/chatanium-bot/v1/src/Database/Internal"
 	"antegr.al/chatanium-bot/v1/src/Handlers"
 	Internal "antegr.al/chatanium-bot/v1/src/Internal"
 	"antegr.al/chatanium-bot/v1/src/Log"
@@ -9,9 +9,9 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func Handle(client *discordgo.Session) {
+func Handle(client *discordgo.Session, db *db.PrismaClient) {
 	// TODO: Database (Save Guild ID, etc.)
-	var GuildCmds []Commands
+	var GuildCmdStorage []Commands
 
 	// Register all commands from all guilds
 	client.AddHandler(func(s *discordgo.Session, g *discordgo.GuildCreate) {
@@ -19,7 +19,7 @@ func Handle(client *discordgo.Session) {
 
 		AllowedModules := GetModulesByACL(g.ID)
 
-		Guild := Commands{
+		GuildCmd := Commands{
 			Schema:   Schema.GetAllowedOnly(AllowedModules),
 			Handlers: Handlers.GetAllowedOnly(AllowedModules),
 			Client:   client,
@@ -27,31 +27,29 @@ func Handle(client *discordgo.Session) {
 		}
 
 		// Register commands from guild
-		Guild.RegisterHandlers()
-		Guild.RegisterSchema()
+		GuildCmd.RegisterHandlers()
+		GuildCmd.RegisterSchema()
 
-		GuildCmds = append(GuildCmds, Guild)
+		// Register guild in database
+		RegisterDatabase(db, g)
+
+		GuildCmdStorage = append(GuildCmdStorage, GuildCmd)
 	})
 
 	// Remove all commands from left guilds
 	client.AddHandler(func(s *discordgo.Session, g *discordgo.GuildDelete) {
 		Log.Verbose.Printf("Left Guild: %v (%v)", g.Name, g.ID)
 
-		for i, v := range GuildCmds {
+		for i, v := range GuildCmdStorage {
 			if v.GuildID == g.ID {
 				v.RemoveSchema()
-				GuildCmds = append(GuildCmds[:i], GuildCmds[i+1:]...)
+				GuildCmdStorage = append(GuildCmdStorage[:i], GuildCmdStorage[i+1:]...)
 				break
 			}
 		}
 	})
 
-	// Database
-	Pool := &Database.Pool{}
-	Pool.Get()
-	defer Pool.Close()
-
 	// Internal Modules
-	Internal.MemberLogger(client, Pool.Conn)
-	Internal.MessageLogger(client, Pool.Conn)
+	Internal.MemberLogger(client, db)
+	Internal.MessageLogger(client, db)
 }

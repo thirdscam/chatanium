@@ -4,6 +4,7 @@ import (
 	"flag"
 	"os"
 
+	db "antegr.al/chatanium-bot/v1/src/Database/Internal"
 	"antegr.al/chatanium-bot/v1/src/Ignite"
 	"antegr.al/chatanium-bot/v1/src/Log"
 	"github.com/bwmarrin/discordgo"
@@ -31,20 +32,30 @@ func main() {
 	// Create a channel to receive OS signals
 	interrupt := make(chan os.Signal)
 
+	// Create a channel for disconnecting the database
+	dbConn := make(chan *db.PrismaClient, 1)
+
 	// Ignite Backend (Discord Bot, Status Page, etc.)
-	go Ignite.Discord(interrupt, client)
+	go Ignite.Discord(interrupt, client, dbConn)
 
 	// Wait for a signal to shutdown
 	<-interrupt
-	shutdown(interrupt, client)
+	shutdown(interrupt, client, dbConn)
 }
 
-func shutdown(Singal chan os.Signal, Client *discordgo.Session) {
+func shutdown(Singal chan os.Signal, Client *discordgo.Session, database chan *db.PrismaClient) {
 	Log.Info.Println("Shutting down...")
 
 	// Close the client
 	if err := Client.Close(); err != nil {
-		Log.Error.Panicf("Cannot close connection: %v", err)
+		Log.Error.Panicf("Cannot close discord connection: %v", err)
+	}
+
+	// Close the database connection
+	var dbConn *db.PrismaClient
+	dbConn = <-database // Wait for the database to connect
+	if err := dbConn.Prisma.Disconnect(); err != nil {
+		Log.Error.Panicf("Cannot close database connection: %v", err)
 	}
 
 	Log.Info.Println("Successfully shutdown.")
