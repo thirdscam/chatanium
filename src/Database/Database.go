@@ -10,18 +10,9 @@ import (
 	"antegr.al/chatanium-bot/v1/src/util"
 )
 
-func Get() (error, *db.PrismaClient) {
-	client := db.NewClient()
-	if err := client.Prisma.Connect(); err != nil {
-		return err, nil
-	}
-
-	return nil, client
-}
-
 func InsertUser(database *db.PrismaClient, uid string, username string) {
 	ctx := context.Background()
-	Log.Verbose.Printf("%s (%s) > Adding user...", username, uid)
+	Log.Verbose.Printf("U:%s (%s) > Adding user...", uid, username)
 
 	Users := db.Users
 
@@ -29,10 +20,10 @@ func InsertUser(database *db.PrismaClient, uid string, username string) {
 		Users.ID.Equals(util.StringToBigint(uid)),
 	).Exec(ctx)
 	if err == nil {
-		Log.Verbose.Printf("%s (%s) > User already exists.", username, uid)
+		Log.Verbose.Printf("U:%s (%s) > User already exists.", uid, username)
 		return
 	} else if !errors.Is(err, db.ErrNotFound) {
-		Log.Error.Fatalf("%s (%s) > Failed to find user: %v", username, uid, err)
+		Log.Error.Fatalf("U:%s (%s) > Failed to find user: %v", uid, username, err)
 	}
 
 	_, err = database.Users.CreateOne(

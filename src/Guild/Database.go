@@ -13,21 +13,32 @@ import (
 )
 
 func RegisterDatabase(client *discordgo.Session, database *db.PrismaClient, g *discordgo.GuildCreate) {
-	Log.Verbose.Printf("%s > Adding database...", g.ID)
+	Log.Verbose.Printf("G:%s > Adding database...", g.ID)
 
 	OwnerUsername := SearchUsernameByUID(client, g.OwnerID, g.ID)
 	if OwnerUsername == "" {
-		Log.Error.Fatalf("%s > Failed to find owner username from id", g.ID)
+		Log.Error.Fatalf("G:%s > Failed to find owner username from id", g.ID)
 	}
 
-	Log.Verbose.Printf("%s > Found owner username: %s (%s)", g.ID, OwnerUsername, g.OwnerID)
+	Log.Verbose.Printf("G:%s > Found owner username: %s (%s)", g.ID, OwnerUsername, g.OwnerID)
 
 	Database.InsertUser(database, g.OwnerID, OwnerUsername)
 	InsertGuild(database, g.ID, g.Name, g.OwnerID)
 
+	var Inserted int
 	for _, v := range g.Channels {
-		UpsertChannel(database, v.ID, g.ID, v.Name, v.Topic)
+		isInserted := InsertChannel(database, v.ID, g.ID, v.Name, v.Topic)
+		if isInserted {
+			Inserted++
+		}
 	}
+
+	if Inserted > 0 {
+		Log.Verbose.Printf("G:%s > Inserted %d new channels.", g.ID, Inserted)
+		return
+	}
+
+	Log.Verbose.Printf("G:%s > All channels already exists.", g.ID)
 }
 
 func InsertGuild(database *db.PrismaClient, gid, name, ownerUid string) {
@@ -39,10 +50,10 @@ func InsertGuild(database *db.PrismaClient, gid, name, ownerUid string) {
 		Guild.ID.Equals(util.StringToBigint(gid)),
 	).Exec(ctx)
 	if err == nil {
-		Log.Verbose.Printf("%s > Guild already exists.", gid)
+		Log.Verbose.Printf("G:%s > Guild already exists.", gid)
 		return
 	} else if !errors.Is(err, db.ErrNotFound) {
-		Log.Error.Fatalf("%s > Failed to find guild: %v", gid, err)
+		Log.Error.Fatalf("G:%s > Failed to find guild: %v", gid, err)
 	}
 
 	_, err = database.Guilds.CreateOne(
@@ -57,19 +68,19 @@ func InsertGuild(database *db.PrismaClient, gid, name, ownerUid string) {
 	Log.Verbose.Printf("%s > Guild insert completed.", gid)
 }
 
-func UpsertChannel(database *db.PrismaClient, cid, gid, name, description string) {
+func InsertChannel(database *db.PrismaClient, cid, gid, name, description string) bool {
 	ctx := context.Background()
 
-	// Database Task: Upsert channel
+	// Database Task: Insert channel
 	Channel := db.Channels
 	_, err := database.Channels.FindUnique(
 		Channel.ID.Equals(util.StringToBigint(cid)),
 	).Exec(ctx)
 	if err == nil {
-		Log.Verbose.Printf("%s::%s > Channel already exists.", gid, cid)
-		return
+		Log.Verbose.Printf("G:%s | C:%s > Channel already exists.", gid, cid)
+		return false
 	} else if !errors.Is(err, db.ErrNotFound) {
-		Log.Error.Fatalf("%s::%s > Failed to find guild: %v", gid, cid, err)
+		Log.Error.Fatalf("G:%s | C:%s > Failed to find guild: %v", gid, cid, err)
 	}
 
 	_, err = database.Channels.CreateOne(
@@ -82,7 +93,11 @@ func UpsertChannel(database *db.PrismaClient, cid, gid, name, description string
 		Log.Error.Fatalf("Failed to upsert channel: %v", err)
 	}
 
-	Log.Verbose.Printf("%s::%s > Channel insert completed.", gid, cid)
+	Log.Verbose.Printf("G:%s | C:%s > Channel insert completed.", gid, cid)
+	return true
+}
+
+func InsertUser(database *db.PrismaClient, uid, gid, username string) {
 }
 
 // func UpsertUser(database *db.PrismaClient, uid, gid, username string) {
