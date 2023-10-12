@@ -10,6 +10,7 @@ import (
 	"antegr.al/chatanium-bot/v1/src/Log"
 	"antegr.al/chatanium-bot/v1/src/util"
 	"github.com/bwmarrin/discordgo"
+	"github.com/google/uuid"
 )
 
 func RegisterDatabase(client *discordgo.Session, database *db.PrismaClient, g *discordgo.GuildCreate) {
@@ -90,14 +91,53 @@ func InsertChannel(database *db.PrismaClient, cid, gid, name, description string
 		Channel.Guilds.Link(db.Guilds.ID.Equals(util.StringToBigint(gid))),
 	).Exec(ctx)
 	if err != nil {
-		Log.Error.Fatalf("Failed to upsert channel: %v", err)
+		Log.Error.Fatalf("Failed to insert channel: %v", err)
 	}
 
 	Log.Verbose.Printf("G:%s | C:%s > Channel insert completed.", gid, cid)
 	return true
 }
 
-func InsertUser(database *db.PrismaClient, uid, gid, username string) {
+func InsertUser(database *db.PrismaClient, uid, gid, username string) bool {
+	ctx := context.Background()
+
+	// Database task: Check exists member in guild
+	Guilduser := db.Guildusers
+	_, err := database.Guildusers.FindFirst(
+		Guilduser.UserID.Equals(util.StringToBigint(uid)),
+	).Exec(ctx)
+	if err == nil {
+		Log.Verbose.Printf("G:%s > Guild already exists.", gid)
+		return false
+	} else if !errors.Is(err, db.ErrNotFound) {
+		Log.Error.Fatalf("G:%s > Failed to find guild: %v", gid, err)
+	}
+
+	// Database task: Check exists guild
+	Guild := db.Guilds
+	_, err = database.Guilds.FindUnique(
+		Guild.ID.Equals(util.StringToBigint(gid)),
+	).Exec(ctx)
+	if err == nil {
+		Log.Verbose.Printf("G:%s > Guild already exists.", gid)
+		return false
+	} else if !errors.Is(err, db.ErrNotFound) {
+		Log.Error.Fatalf("G:%s > Failed to find guild: %v", gid, err)
+	}
+
+	// Database Task: Insert user (Guild Member)
+	newUuid := uuid.New().String()
+	_, err = database.Guildusers.CreateOne(
+		Guilduser.UUID.Set(newUuid),
+		Guilduser.UserID.Set(util.StringToBigint(uid)),
+		Guilduser.CreatedAt.Set(time.Now()),
+		Guilduser.Guilds.Link(db.Guilds.ID.Equals(util.StringToBigint(gid))),
+	).Exec(ctx)
+	if err != nil {
+		Log.Error.Fatalf("Failed to insert guild user: %v", err)
+	}
+
+	return true
 }
 
 // func UpsertUser(database *db.PrismaClient, uid, gid, username string) {

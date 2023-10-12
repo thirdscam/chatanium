@@ -80,8 +80,6 @@ func MemberLogger(client *discordgo.Session, dbClient *db.PrismaClient) {
 func createMessage(m *discordgo.MessageCreate, database *db.PrismaClient) {
 	ctx := context.Background()
 
-	// Database Task: Upsert user
-
 	// Database Task: Insert message
 	Msg := db.Messages
 	_, err := database.Messages.CreateOne(
@@ -89,6 +87,7 @@ func createMessage(m *discordgo.MessageCreate, database *db.PrismaClient) {
 		Msg.Type.Set(int(m.Type)),
 		Msg.CreatedAt.Set(m.Timestamp),
 		Msg.Users.Link(db.Users.ID.Equals(util.StringToBigint(m.Author.ID))),
+		Msg.Contents.Set(m.Content),
 		Msg.Guilds.Link(db.Guilds.ID.Equals(util.StringToBigint(m.GuildID))),
 		Msg.Channels.Link(db.Channels.ID.Equals(util.StringToBigint(m.ChannelID))),
 	).Exec(ctx)
