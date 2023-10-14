@@ -107,10 +107,10 @@ func InsertUser(database *db.PrismaClient, uid, gid, username string) bool {
 		Guilduser.UserID.Equals(util.StringToBigint(uid)),
 	).Exec(ctx)
 	if err == nil {
-		Log.Verbose.Printf("G:%s > Guild already exists.", gid)
+		Log.Verbose.Printf("G:%s > Guild user already exists.", uid)
 		return false
 	} else if !errors.Is(err, db.ErrNotFound) {
-		Log.Error.Fatalf("G:%s > Failed to find guild: %v", gid, err)
+		Log.Error.Fatalf("G:%s > Failed to find guild user: %v", uid, err)
 	}
 
 	// Database task: Check exists guild
