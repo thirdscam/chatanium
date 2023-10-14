@@ -4,8 +4,9 @@ import "github.com/bwmarrin/discordgo"
 
 func GetAll() map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	return map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-		// Write your handler of commands for module here
-		"ping": HandlePing,
+		// Write your handler of COMMANDS for module here
+		"ping":           HandlePing,
+		"snowflake2time": HandleSnowflake2time,
 	}
 }
 

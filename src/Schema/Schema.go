@@ -4,8 +4,9 @@ import "github.com/bwmarrin/discordgo"
 
 func getDefinedSchema() map[string]func() *discordgo.ApplicationCommand {
 	return map[string]func() *discordgo.ApplicationCommand{
-		// Write your schema of commands for module here
-		"ping": GetPing,
+		// Write your schema of module here
+		"Ping":      GetPing,
+		"Snowflake": GetSnowflake,
 	}
 }
 
