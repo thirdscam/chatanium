@@ -2,28 +2,16 @@ package Ignite
 
 import (
 	"os"
+	"os/signal"
 
-	db "antegr.al/chatanium-bot/v1/src/Database/Internal"
 	"antegr.al/chatanium-bot/v1/src/Log"
-	"github.com/bwmarrin/discordgo"
 )
 
-func Shutdown(Singal chan os.Signal, Client *discordgo.Session, database *db.PrismaClient) {
-	<-Singal // Wait for a signal
-	Log.Info.Println("Shutting down...")
+// WaitSignal waits for a signal to shutdown (Interrupt, Kill)
+func WaitSignal() {
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, os.Kill)
+	<-c // Wait for a signal
 
-	// Close the client
-	if err := Client.Close(); err != nil {
-		Log.Error.Panicf("Cannot close discord connection: %v", err)
-	}
-	Log.Verbose.Println("Discord connection closed.")
-
-	// Close the database connection
-	if err := database.Prisma.Disconnect(); err != nil {
-		Log.Error.Panicf("Cannot close database connection: %v", err)
-	}
-	Log.Verbose.Println("Database connection closed.")
-
-	Log.Info.Println("Successfully shutdown.")
-	os.Exit(0)
+	Log.Info.Println("Starting shutdown process. Please wait...")
 }

@@ -2,11 +2,9 @@ package main
 
 import (
 	"flag"
-	"os"
 
 	"antegr.al/chatanium-bot/v1/src/Ignite"
 	"antegr.al/chatanium-bot/v1/src/Log"
-	"github.com/bwmarrin/discordgo"
 )
 
 var (
@@ -25,27 +23,24 @@ func main() {
 	Log.Info.Println("Antegral/Chatanium: Scalable Bot Management System")
 	Log.Info.Println("Press CTRL+C to shutdown.")
 
-	// Create the session
-	client := getClient("MTE1NDc4NTkzOTM5OTM3Njk2Ng.GEwjcR.Bc5uPjRJ1ceE8jtkqk3P4iLtCpbPIqx5Gq8brE")
+	// Example: Ignite Backend for 3 steps
+	// Database := Ignite.DB{}   // 1. Prepare
+	// db := Database.Start()    // 2. Start
+	// defer Database.Shutdown() // 3. Shutdown
 
-	// Create a channel to receive OS signals
-	interrupt := make(chan os.Signal)
+	// Ignite Database
+	Database := Ignite.DB{}
+	db := Database.Start()
+	defer Database.Shutdown()
 
-	// Create a channel for disconnecting the database
-	dbConn := Ignite.DB()
-
-	// Ignite Backend (Discord Bot, Status Page, etc.)
-	go Ignite.Discord(interrupt, client, dbConn)
+	// Ignite Discord
+	Discord := Ignite.Discord{
+		Database: db,
+		Token:    "MTE1NDc4NTkzOTM5OTM3Njk2Ng.GEwjcR.Bc5uPjRJ1ceE8jtkqk3P4iLtCpbPIqx5Gq8brE",
+	}
+	Discord.Start()
+	defer Discord.Shutdown()
 
 	// Wait for a signal to shutdown
-	Ignite.Shutdown(interrupt, client, dbConn)
-}
-
-func getClient(token string) *discordgo.Session {
-	discord, err := discordgo.New("Bot " + token)
-	if err != nil {
-		Log.Error.Fatalln("Failed to create discord session: ", err)
-	}
-
-	return discord
+	Ignite.WaitSignal()
 }

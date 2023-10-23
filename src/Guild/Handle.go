@@ -1,6 +1,7 @@
 package Guild
 
 import (
+	"antegr.al/chatanium-bot/v1/src/Database"
 	db "antegr.al/chatanium-bot/v1/src/Database/Internal"
 	"antegr.al/chatanium-bot/v1/src/Handlers"
 	Internal "antegr.al/chatanium-bot/v1/src/Internal"
@@ -31,7 +32,7 @@ func Handle(client *discordgo.Session, db *db.PrismaClient) {
 		GuildCmd.RegisterSchema()
 
 		// Register guild in database
-		RegisterDatabase(client, db, g)
+		Database.RegisterGuild(client, db, g)
 
 		GuildCmdStorage = append(GuildCmdStorage, GuildCmd)
 	})

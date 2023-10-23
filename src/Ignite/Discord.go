@@ -1,17 +1,28 @@
 package Ignite
 
 import (
-	"os"
-	"os/signal"
-
 	db "antegr.al/chatanium-bot/v1/src/Database/Internal"
 	"antegr.al/chatanium-bot/v1/src/Guild"
 	"antegr.al/chatanium-bot/v1/src/Log"
 	"github.com/bwmarrin/discordgo"
 )
 
-func Discord(singal chan os.Signal, client *discordgo.Session, db *db.PrismaClient) {
+type Discord struct {
+	Database *db.PrismaClient
+	Token    string
+	client   *discordgo.Session
+}
+
+// Start the discord bot backend
+func (t *Discord) Start() {
 	Log.Info.Println("Starting Bot...")
+
+	client, err := discordgo.New("Bot " + t.Token)
+	if err != nil {
+		Log.Error.Fatalln("Failed to create discord session: ", err)
+	}
+
+	t.client = client
 
 	// Open the connection from discord
 	if err := client.Open(); err != nil {
@@ -28,8 +39,14 @@ func Discord(singal chan os.Signal, client *discordgo.Session, db *db.PrismaClie
 	})
 
 	// Handle all guilds
-	Guild.Handle(client, db)
+	go Guild.Handle(client, t.Database)
+}
 
-	// if received a interrupt signal (CTRL+C), shutdown.
-	signal.Notify(singal, os.Interrupt)
+// Close the connection from discord
+func (t *Discord) Shutdown() {
+	Log.Verbose.Println("Shutting down discord connection...")
+	if err := t.client.Close(); err != nil {
+		Log.Error.Panicf("Cannot close discord connection: %v", err)
+	}
+	Log.Verbose.Println("Closed successfully!")
 }

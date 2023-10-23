@@ -10,6 +10,7 @@
       "request": "launch",
       "mode": "auto",
       "program": "${workspaceFolder}/src/main.go",
+      "console": "integratedTerminal",
       "cwd": "${workspaceFolder}"
     }
   ]

@@ -12,7 +12,7 @@ import (
 
 func InsertUser(database *db.PrismaClient, uid string, username string) {
 	ctx := context.Background()
-	Log.Verbose.Printf("U:%s (%s) > Adding user...", uid, username)
+	// Log.Verbose.Printf("U:%s (%s) > Adding user...", uid, username)
 
 	Users := db.Users
 
@@ -20,7 +20,7 @@ func InsertUser(database *db.PrismaClient, uid string, username string) {
 		Users.ID.Equals(util.StringToBigint(uid)),
 	).Exec(ctx)
 	if err == nil {
-		Log.Verbose.Printf("U:%s (%s) > User already exists.", uid, username)
+		// Log.Verbose.Printf("U:%s (%s) > User already exists.", uid, username)
 		return
 	} else if !errors.Is(err, db.ErrNotFound) {
 		Log.Error.Fatalf("U:%s (%s) > Failed to find user: %v", uid, username, err)

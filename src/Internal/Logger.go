@@ -3,7 +3,9 @@ package Internal
 import (
 	"context"
 	"errors"
+	"fmt"
 
+	"antegr.al/chatanium-bot/v1/src/Database"
 	db "antegr.al/chatanium-bot/v1/src/Database/Internal"
 	"antegr.al/chatanium-bot/v1/src/Log"
 	"antegr.al/chatanium-bot/v1/src/util"
@@ -19,6 +21,19 @@ func MessageLogger(client *discordgo.Session, database *db.PrismaClient) {
 		if m.Author.ID == client.State.User.ID {
 			return
 		}
+
+		// Search owner nickname
+
+		// st.ni
+		st, err := client.GuildMember(m.GuildID, m.Author.ID)
+		// st, err := s.User(m.Author.ID)
+		if err != nil {
+			Log.Error.Fatalf("G:%v | U:%v > Failed to get member: %v", m.GuildID, m.Author.ID, err)
+		}
+		fmt.Printf("%v", st)
+		// if st.Flags == "" {
+		// 	Log.Error.Fatalf("G:%s > Failed to find owner username from id", m.GuildID)
+		// }
 
 		createMessage(m, database)
 		Log.Verbose.Printf("G:%v | C:%v > %v: %v", m.GuildID, m.ChannelID, m.Author.Username, m.Content)
@@ -79,6 +94,12 @@ func MemberLogger(client *discordgo.Session, dbClient *db.PrismaClient) {
 
 func createMessage(m *discordgo.MessageCreate, database *db.PrismaClient) {
 	ctx := context.Background()
+
+	// Database insert user
+	Database.InsertUser(database, m.Author.ID, m.Author.Username)
+
+	// Database insert member (guild user)
+	Database.InsertMember(database, m.Author.ID, m.GuildID, m.Message.Member.Nick)
 
 	// Database Task: Insert message
 	Msg := db.Messages

@@ -37,13 +37,16 @@ model guilds {
   moduleacl  moduleacl?
 }
 
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model guildusers {
-  uuid       String    @id(map: "pk_4") @db.Uuid
   guild_id   BigInt
-  user_id    BigInt
   created_at DateTime  @db.Timestamp(6)
   quit_at    DateTime? @db.Timestamp(6)
+  user_id    BigInt
+  nickname   String    @db.VarChar(32)
+  uuid       String    @id(map: "pk_4") @db.Uuid
   guilds     guilds    @relation(fields: [guild_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_3")
+  users      users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_4")
 }
 
 model kvstorages {
@@ -75,11 +78,12 @@ model moduleacl {
 }
 
 model users {
-  id         BigInt      @id(map: "pk_7")
-  username   String      @db.Char(32)
-  created_at DateTime    @db.Timestamp(6)
-  deleted_at DateTime?   @db.Timestamp(6)
+  id         BigInt       @id(map: "pk_7")
+  username   String       @db.Char(32)
+  created_at DateTime     @db.Timestamp(6)
+  deleted_at DateTime?    @db.Timestamp(6)
   guilds     guilds[]
+  guildusers guildusers[]
   kvstorages kvstorages?
   messages   messages[]
 }
