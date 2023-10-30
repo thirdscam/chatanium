@@ -22,7 +22,24 @@ func MessageLogger(client *discordgo.Session, database *db.PrismaClient) {
 			return
 		}
 
+		// TODO: global_name (default nickname) unsupported issue
+		//
+		// Member.Nick에서 Profile by Guild에 대한 Nickname을 가져올 수 있음.
+		// 이는 Profile by Guild이므로, Default Value는 ""임.
+		//
+		// 따라서, default nickname을 User.global_name에서 가져와야 함.
+		// 단, 이 기능은 현재 discordgo에서는 지원하지 않음.
+		//
+		// v0.27.1 (Latest, 2023/03): https://pkg.go.dev/github.com/bwmarrin/discordgo#User
+		// Development (Unreleased, 2023/07): https://github.com/bwmarrin/discordgo/blame/master/user.go#L53
+
+		// TODO: Nickname failback
+		// 현재 모든 유저에 대한 Nickname 수집을 보장 할 수 없음.
+		// 따라서, Nickname을 null로 설정하고, failback 구현.
+
 		// Search owner nickname
+		u, _ := client.GuildMember(m.GuildID, m.Author.ID)
+		_ = u
 
 		// st.ni
 		st, err := client.GuildMember(m.GuildID, m.Author.ID)
@@ -69,7 +86,7 @@ func MessageLogger(client *discordgo.Session, database *db.PrismaClient) {
 }
 
 func MemberLogger(client *discordgo.Session, dbClient *db.PrismaClient) {
-	// TODO: Database (Save Meesage, actions)
+	// TODO: Database (Save Message, actions)
 
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
 		Log.Verbose.Printf("MEMBER/JOIN (%v) %v", m.GuildID, m.Nick)

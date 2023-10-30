@@ -11,7 +11,6 @@ import (
 )
 
 func Handle(client *discordgo.Session, db *db.PrismaClient) {
-	// TODO: Database (Save Guild ID, etc.)
 	var GuildCmdStorage []Commands
 
 	// Register all commands from all guilds
