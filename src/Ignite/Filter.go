@@ -8,7 +8,7 @@ func GetModulesByACL(GuildID string) []string {
 	case "919823370600742942":
 		return []string{"ping", "echo"}
 	default:
-		Log.Warn.Printf("%s > No ACL defined, using default", GuildID)
+		Log.Warn.Printf("%s > Undefined ACL, using default", GuildID)
 		return []string{}
 	}
 }
