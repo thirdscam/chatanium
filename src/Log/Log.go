@@ -11,6 +11,11 @@ import (
 )
 
 var (
+	PRODUCTION_MODE  = 3
+	DEVELOPMENT_MODE = 4
+)
+
+var (
 	Verbose *log.Logger
 	Warn    *log.Logger
 	Info    *log.Logger

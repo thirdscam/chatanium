@@ -1,24 +1,17 @@
 package main
 
 import (
-	"flag"
-
 	"antegr.al/chatanium-bot/v1/src/Ignite"
 	"antegr.al/chatanium-bot/v1/src/Log"
-)
-
-var (
-	Token       string
-	LoggingMode int
+	util "antegr.al/chatanium-bot/v1/src/Util"
 )
 
 func main() {
-	flag.StringVar(&Token, "token", "", "Address to proxy")
-	flag.IntVar(&LoggingMode, "logging-mode", 4, "Logging mode")
+	// Init the environment variables
+	util.InitEnv()
 
-	// Parse the flags and init the logger
-	flag.Parse()
-	Log.Init(LoggingMode)
+	// Init the logging system
+	util.InitLog()
 
 	Log.Info.Println("Antegral/Chatanium: Scalable Bot Management System")
 	Log.Info.Println("Press CTRL+C to shutdown.")
