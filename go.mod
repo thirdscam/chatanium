@@ -5,6 +5,7 @@ go 1.19
 require github.com/bwmarrin/discordgo v0.27.1 // direct
 
 require (
+	github.com/fatih/color v1.15.0
 	github.com/google/uuid v1.3.1
 	github.com/iancoleman/strcase v0.0.0-20190422225806-e506e3ef7365
 	github.com/joho/godotenv v1.5.1
@@ -16,6 +17,8 @@ require (
 
 require (
 	github.com/gorilla/websocket v1.4.2 // indirect
+	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-isatty v0.0.17 // indirect
 	golang.org/x/crypto v0.9.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
 )

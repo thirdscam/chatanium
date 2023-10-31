@@ -16,6 +16,6 @@ func InitLog() {
 		Log.Init(Log.DEVELOPMENT_MODE)
 	default:
 		Log.Init(Log.PRODUCTION_MODE)
-		Log.Warn.Printf("Invalid logging mode: %s", mode)
+		Log.Warn.Printf("Invalid logging mode: %s, set log level for production", mode)
 	}
 }

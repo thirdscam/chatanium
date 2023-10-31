@@ -8,6 +8,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/fatih/color"
 )
 
 var (
@@ -22,7 +24,7 @@ var (
 	Error   *log.Logger
 )
 
-func Init(mode int) error {
+func Init(level int) error {
 	Verbose = log.New(io.Discard, "[VERBOSE] ", log.Ldate|log.Ltime|log.Lshortfile)
 	Info = log.New(io.Discard, "[INFO] ", log.Ldate|log.Ltime|log.Lshortfile)
 	Warn = log.New(io.Discard, "[WARNING] ", log.Ldate|log.Ltime|log.Lshortfile)
@@ -56,32 +58,32 @@ func Init(mode int) error {
 
 	Writer := io.MultiWriter(LogFile, os.Stdout)
 
-	if mode < 1 {
+	if level < 1 {
 		panic("Invaild logging mode. (1, 2, 3, 4)")
 	}
 
-	if mode >= 1 {
-		Error = log.New(os.Stderr, "[ERROR] ", log.Ldate|log.Ltime|log.Lshortfile)
+	if level >= 1 {
+		Error = log.New(os.Stderr, color.HiRedString("[ERROR] "), log.Ldate|log.Ltime)
 		Error.SetOutput(Writer)
 	}
 
-	if mode >= 2 {
-		Warn = log.New(os.Stdout, "[WARNING] ", log.Ldate|log.Ltime|log.Lshortfile)
+	if level >= 2 {
+		Warn = log.New(os.Stdout, color.YellowString("[WARN] "), log.Ldate|log.Ltime)
 		Warn.SetOutput(Writer)
 	}
 
-	if mode >= 3 {
-		Info = log.New(os.Stdout, "[INFO] ", log.Ldate|log.Ltime|log.Lshortfile)
+	if level >= 3 {
+		Info = log.New(os.Stdout, color.CyanString("[INFO] "), log.Ldate|log.Ltime)
 		Info.SetOutput(Writer)
 	}
 
-	if mode >= 4 {
+	if level >= 4 {
 		Verbose = log.New(os.Stdout, "[VERBOSE] ", log.Ldate|log.Ltime|log.Lshortfile)
 		Info.Println("Verbose logging is enabled. Only use this mode for debugging.")
 		Verbose.SetOutput(Writer)
 	}
 
-	if mode > 4 {
+	if level > 4 {
 		Warn.Println("Logging mode is greater than 4. Logging mode is set to the maximum level.")
 	}
 
