@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"antegr.al/chatanium-bot/v1/src/Ignite"
 	"antegr.al/chatanium-bot/v1/src/Log"
 	util "antegr.al/chatanium-bot/v1/src/Util"
@@ -29,7 +31,7 @@ func main() {
 	// Ignite Discord
 	Discord := Ignite.Discord{
 		Database: db,
-		Token:    "MTE1NDc4NTkzOTM5OTM3Njk2Ng.GEwjcR.Bc5uPjRJ1ceE8jtkqk3P4iLtCpbPIqx5Gq8brE",
+		Token:    os.Getenv("DISCORD_TOKEN"),
 	}
 	Discord.Start()
 	defer Discord.Shutdown()
