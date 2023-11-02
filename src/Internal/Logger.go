@@ -36,12 +36,12 @@ func MessageLogger(client *discordgo.Session, database *db.PrismaClient) {
 		// TODO: Nickname failback
 		// 현재 모든 유저에 대한 Nickname 수집을 보장 할 수 없음.
 		// 따라서, Nickname을 null로 설정하고, failback 구현.
+		// User를 전부 등록시키고 guilduser에는 uid에 대한 nickname등의 Profile by Guild만 저장하게 스키마 변경 필요
 
 		// Search owner nickname
 		u, _ := client.GuildMember(m.GuildID, m.Author.ID)
 		_ = u
 
-		// st.ni
 		st, err := client.GuildMember(m.GuildID, m.Author.ID)
 		// st, err := s.User(m.Author.ID)
 		if err != nil {
