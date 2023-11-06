@@ -12,6 +12,8 @@ import (
 func GetMessageInfo(gid, mid string, database *db.PrismaClient) *db.MessagesModel {
 	msg, err := database.Messages.FindUnique(
 		db.Messages.MessageID.Equals(util.StringToBigint(mid)),
+	).With(
+		db.Messages.Users.Fetch(),
 	).Exec(
 		context.Background(),
 	)

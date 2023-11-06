@@ -2,12 +2,14 @@ package Logger
 
 import (
 	"context"
+	"strings"
 
 	"antegr.al/chatanium-bot/v1/src/Database"
 	db "antegr.al/chatanium-bot/v1/src/Database/Internal"
 	"antegr.al/chatanium-bot/v1/src/Log"
 	util "antegr.al/chatanium-bot/v1/src/Util"
 	"github.com/bwmarrin/discordgo"
+	"github.com/fatih/color"
 )
 
 func createMessage(s *discordgo.Session, m *discordgo.MessageCreate, database *db.PrismaClient) {
@@ -61,5 +63,5 @@ func deleteMessage(s *discordgo.Session, m *discordgo.MessageDelete, database *d
 		return
 	}
 
-	Log.Info.Printf("G:%v | C:%v > DELETED > %v: %v", m.GuildID, m.ChannelID, msg.UserID, content)
+	Log.Info.Printf(color.RedString("G:%v | C:%v > ACTION/DELETE > %v: %v", m.GuildID, m.ChannelID, strings.TrimRight(msg.Users().Username, " "), content))
 }
