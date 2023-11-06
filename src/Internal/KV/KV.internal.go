@@ -3,7 +3,7 @@ package Internal
 // Key-Value Local Storage for User
 //
 // This is a simple key-value storage for user. Modules can use this to store data.
-// or you can store key-value data from kv.
+// or you can store key-value data from KV.
 //
 // Example: /kv <Key> <Value>
 type KV struct {
