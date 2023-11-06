@@ -4,7 +4,7 @@ import (
 	"antegr.al/chatanium-bot/v1/src/Database"
 	db "antegr.al/chatanium-bot/v1/src/Database/Internal"
 	"antegr.al/chatanium-bot/v1/src/Handlers"
-	Internal "antegr.al/chatanium-bot/v1/src/Internal"
+	"antegr.al/chatanium-bot/v1/src/Internal/Logger"
 	"antegr.al/chatanium-bot/v1/src/Log"
 	"antegr.al/chatanium-bot/v1/src/Schema"
 	"github.com/bwmarrin/discordgo"
@@ -50,6 +50,6 @@ func Handle(client *discordgo.Session, db *db.PrismaClient) {
 	})
 
 	// Internal Modules
-	Internal.MemberLogger(client, db)
-	Internal.MessageLogger(client, db)
+	Logger.Member(client, db)
+	Logger.Message(client, db)
 }
