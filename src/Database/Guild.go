@@ -110,8 +110,6 @@ func InsertChannel(database *db.PrismaClient, cid, gid, name, description string
 
 func InsertMember(database *db.PrismaClient, uid, gid, nickname string) bool {
 	ctx := context.Background()
-	Log.Verbose.Printf("G:%s | U:%s > Adding member... (%s)", gid, uid, nickname)
-
 	// Database task: Check exists member in guild
 	Guilduser := db.Guildusers
 	_, err := database.Guildusers.FindFirst(
@@ -124,6 +122,8 @@ func InsertMember(database *db.PrismaClient, uid, gid, nickname string) bool {
 	} else if !errors.Is(err, db.ErrNotFound) {
 		Log.Error.Fatalf("G:%s > Failed to find guild user: %v", uid, err)
 	}
+
+	Log.Verbose.Printf("G:%s | U:%s > Adding member... (%s)", gid, uid, nickname)
 
 	// Database Task: Insert user (Guild Member)
 	newUuid := uuid.New().String()
