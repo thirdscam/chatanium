@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math/big"
 
-	"antegr.al/chatanium-bot/v1/src/Log"
+	"antegr.al/chatanium-bot/v1/src/Util/Log"
 	"github.com/steebchen/prisma-client-go/runtime/types"
 )
 

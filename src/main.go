@@ -4,8 +4,8 @@ import (
 	"os"
 
 	"antegr.al/chatanium-bot/v1/src/Ignite"
-	"antegr.al/chatanium-bot/v1/src/Log"
 	util "antegr.al/chatanium-bot/v1/src/Util"
+	"antegr.al/chatanium-bot/v1/src/Util/Log"
 )
 
 func main() {
@@ -13,7 +13,7 @@ func main() {
 	util.InitEnv()
 
 	// Init the logging system
-	util.InitLog()
+	Log.Init()
 
 	Log.Info.Println("Antegral/Chatanium: Scalable Bot Management System")
 	Log.Info.Println("Press CTRL+C to shutdown.")

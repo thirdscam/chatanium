@@ -1,4 +1,4 @@
-package Schema
+package Slashcmd
 
 import (
 	"github.com/bwmarrin/discordgo"
@@ -12,7 +12,7 @@ func getDefinedSchema() map[string]func() *discordgo.ApplicationCommand {
 	}
 }
 
-func GetAll() []*discordgo.ApplicationCommand {
+func GetAllSchema() []*discordgo.ApplicationCommand {
 	var result []*discordgo.ApplicationCommand
 	schemas := getDefinedSchema()
 
@@ -23,7 +23,7 @@ func GetAll() []*discordgo.ApplicationCommand {
 	return result
 }
 
-func GetOnly(AllowedModules []string) []*discordgo.ApplicationCommand {
+func GetOnlySchema(AllowedModules []string) []*discordgo.ApplicationCommand {
 	var result []*discordgo.ApplicationCommand
 	AllSchemas := getDefinedSchema()
 

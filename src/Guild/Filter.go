@@ -1,6 +1,6 @@
 package Guild
 
-import "antegr.al/chatanium-bot/v1/src/Log"
+import "antegr.al/chatanium-bot/v1/src/Util/Log"
 
 func GetModuleStringByACL(GuildID string) []string {
 	switch GuildID {

@@ -6,8 +6,8 @@ import (
 
 	"antegr.al/chatanium-bot/v1/src/Database"
 	db "antegr.al/chatanium-bot/v1/src/Database/Internal"
-	"antegr.al/chatanium-bot/v1/src/Log"
 	util "antegr.al/chatanium-bot/v1/src/Util"
+	"antegr.al/chatanium-bot/v1/src/Util/Log"
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
 )

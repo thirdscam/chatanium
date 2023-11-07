@@ -12,6 +12,20 @@ import (
 	"github.com/fatih/color"
 )
 
+// Initalize the environment variables from .env file
+func Init() {
+	mode := os.Getenv("LOG_MODE")
+	switch mode {
+	case "production":
+		initLog(PRODUCTION_MODE)
+	case "development":
+		initLog(DEVELOPMENT_MODE)
+	default:
+		initLog(PRODUCTION_MODE)
+		Warn.Printf("Invalid logging mode: %s, set log level for production", mode)
+	}
+}
+
 var (
 	PRODUCTION_MODE  = 3
 	DEVELOPMENT_MODE = 4
@@ -24,7 +38,7 @@ var (
 	Error   *log.Logger
 )
 
-func Init(level int) error {
+func initLog(level int) error {
 	Verbose = log.New(io.Discard, "[VERBOSE] ", log.Ldate|log.Ltime|log.Lshortfile)
 	Info = log.New(io.Discard, "[INFO] ", log.Ldate|log.Ltime|log.Lshortfile)
 	Warn = log.New(io.Discard, "[WARNING] ", log.Ldate|log.Ltime|log.Lshortfile)

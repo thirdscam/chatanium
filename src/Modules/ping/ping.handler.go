@@ -1,4 +1,4 @@
-package Handlers
+package Ping
 
 import "github.com/bwmarrin/discordgo"
 

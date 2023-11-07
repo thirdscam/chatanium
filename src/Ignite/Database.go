@@ -2,7 +2,7 @@ package Ignite
 
 import (
 	db "antegr.al/chatanium-bot/v1/src/Database/Internal"
-	"antegr.al/chatanium-bot/v1/src/Log"
+	"antegr.al/chatanium-bot/v1/src/Util/Log"
 )
 
 type DB struct {

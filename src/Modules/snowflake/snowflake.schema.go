@@ -1,4 +1,4 @@
-package Schema
+package Snowflake
 
 import "github.com/bwmarrin/discordgo"
 

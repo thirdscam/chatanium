@@ -4,7 +4,7 @@ import (
 	"os"
 	"os/signal"
 
-	"antegr.al/chatanium-bot/v1/src/Log"
+	"antegr.al/chatanium-bot/v1/src/Util/Log"
 )
 
 // WaitSignal waits for a signal to shutdown (Interrupt, Kill)

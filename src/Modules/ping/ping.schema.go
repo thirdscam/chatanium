@@ -1,4 +1,4 @@
-package Schema
+package Ping
 
 import "github.com/bwmarrin/discordgo"
 

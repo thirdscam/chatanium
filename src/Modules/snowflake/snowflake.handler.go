@@ -1,11 +1,11 @@
-package Handlers
+package Snowflake
 
 import (
 	"fmt"
 	"math/big"
 	"time"
 
-	"antegr.al/chatanium-bot/v1/src/Log"
+	"antegr.al/chatanium-bot/v1/src/Util/Log"
 	"github.com/bwmarrin/discordgo"
 )
 

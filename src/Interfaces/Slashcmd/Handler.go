@@ -1,10 +1,10 @@
-package Handlers
+package Slashcmd
 
 import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func GetAll() map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+func GetAllHandler() map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	return map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 		// Write your handler of COMMANDS for module here
 		"ping":           HandlePing,
@@ -12,9 +12,9 @@ func GetAll() map[string]func(s *discordgo.Session, i *discordgo.InteractionCrea
 	}
 }
 
-func GetOnly(AllowedModules []string) map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+func GetOnlyHandler(AllowedModules []string) map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	result := make(map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate))
-	AllHandlers := GetAll()
+	AllHandlers := GetAllHandler()
 
 	for _, v := range AllowedModules {
 		for name, fn := range AllHandlers {
