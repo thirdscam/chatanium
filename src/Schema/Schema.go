@@ -1,6 +1,8 @@
 package Schema
 
-import "github.com/bwmarrin/discordgo"
+import (
+	"github.com/bwmarrin/discordgo"
+)
 
 func getDefinedSchema() map[string]func() *discordgo.ApplicationCommand {
 	return map[string]func() *discordgo.ApplicationCommand{
@@ -21,7 +23,7 @@ func GetAll() []*discordgo.ApplicationCommand {
 	return result
 }
 
-func GetAllowedOnly(AllowedModules []string) []*discordgo.ApplicationCommand {
+func GetOnly(AllowedModules []string) []*discordgo.ApplicationCommand {
 	var result []*discordgo.ApplicationCommand
 	AllSchemas := getDefinedSchema()
 

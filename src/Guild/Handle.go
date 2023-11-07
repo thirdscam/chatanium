@@ -17,11 +17,11 @@ func Handle(client *discordgo.Session, db *db.PrismaClient) {
 	client.AddHandler(func(s *discordgo.Session, g *discordgo.GuildCreate) {
 		Log.Verbose.Printf("Joined Guild: %v (%v)", g.Name, g.ID)
 
-		AllowedModules := GetModulesByACL(g.ID)
+		AllowedModules := GetModuleStringByACL(g.ID)
 
 		GuildCmd := Commands{
-			Schema:   Schema.GetAllowedOnly(AllowedModules),
-			Handlers: Handlers.GetAllowedOnly(AllowedModules),
+			Schema:   Schema.GetOnly(AllowedModules),
+			Handlers: Handlers.GetOnly(AllowedModules),
 			Client:   client,
 			GuildID:  g.ID,
 		}

@@ -1,6 +1,8 @@
 package Handlers
 
-import "github.com/bwmarrin/discordgo"
+import (
+	"github.com/bwmarrin/discordgo"
+)
 
 func GetAll() map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	return map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
@@ -10,7 +12,7 @@ func GetAll() map[string]func(s *discordgo.Session, i *discordgo.InteractionCrea
 	}
 }
 
-func GetAllowedOnly(AllowedModules []string) map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+func GetOnly(AllowedModules []string) map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	result := make(map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate))
 	AllHandlers := GetAll()
 

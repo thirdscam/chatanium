@@ -19,8 +19,10 @@ func GetMessageInfo(gid, mid string, database *db.PrismaClient) *db.MessagesMode
 	)
 	if errors.Is(err, db.ErrNotFound) {
 		Log.Error.Printf("G:%s | M:%s > Cannot find message : %v", gid, mid, err)
+		return nil
 	} else if err != nil {
 		Log.Error.Printf("G:%s | M:%s > Failed to find message : %v", gid, mid, err)
+		return nil
 	}
 
 	return msg
