@@ -1,4 +1,4 @@
-package Ignite
+package Util
 
 import (
 	"os"

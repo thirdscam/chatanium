@@ -1,4 +1,4 @@
-package Ignite
+package Database
 
 import (
 	db "antegr.al/chatanium-bot/v1/src/Database/Internal"

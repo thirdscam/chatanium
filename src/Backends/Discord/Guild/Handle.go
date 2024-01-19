@@ -1,9 +1,9 @@
 package Guild
 
 import (
-	"antegr.al/chatanium-bot/v1/src/Database"
+	"antegr.al/chatanium-bot/v1/src/Backend/Discord/Database"
+	"antegr.al/chatanium-bot/v1/src/Backend/Discord/Handlers"
 	db "antegr.al/chatanium-bot/v1/src/Database/Internal"
-	"antegr.al/chatanium-bot/v1/src/Handlers"
 	"antegr.al/chatanium-bot/v1/src/Internal/Logger"
 	"antegr.al/chatanium-bot/v1/src/Schema"
 	"antegr.al/chatanium-bot/v1/src/Util/Log"

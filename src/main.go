@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"antegr.al/chatanium-bot/v1/src/Ignite"
+	"antegr.al/chatanium-bot/v1/src/Backends/Discord"
 	util "antegr.al/chatanium-bot/v1/src/Util"
 	"antegr.al/chatanium-bot/v1/src/Util/Log"
 )
@@ -37,5 +37,5 @@ func main() {
 	defer Discord.Shutdown()
 
 	// Wait for a signal to shutdown
-	Ignite.WaitSignal()
+	util.WaitSignal()
 }

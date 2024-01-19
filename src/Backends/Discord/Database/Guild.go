@@ -26,13 +26,13 @@ func RegisterGuild(client *discordgo.Session, database *db.PrismaClient, g *disc
 	OwnerUsername := st.User.Username
 	Log.Verbose.Printf("G:%s > Found owner username: %s (%s)", g.ID, OwnerUsername, g.OwnerID)
 
-	// Database insert user (Guild Owner)
+	// Database: insert user (Guild Owner)
 	InsertUser(database, g.OwnerID, OwnerUsername)
 
-	// Database insert guild
+	// Database: insert guild
 	InsertGuild(database, g.ID, g.Name, g.OwnerID)
 
-	// Database insert member (Guild Owner)
+	// Database: insert member (Guild Owner)
 	InsertMember(database, g.OwnerID, g.ID, OwnerUsername)
 
 	var Inserted int

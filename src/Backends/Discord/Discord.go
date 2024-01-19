@@ -1,8 +1,8 @@
-package Ignite
+package Discord
 
 import (
+	"antegr.al/chatanium-bot/v1/src/Backends/Discord/Guild"
 	db "antegr.al/chatanium-bot/v1/src/Database/Internal"
-	"antegr.al/chatanium-bot/v1/src/Guild"
 	"antegr.al/chatanium-bot/v1/src/Util/Log"
 	"github.com/bwmarrin/discordgo"
 )

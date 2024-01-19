@@ -74,6 +74,7 @@ type finder struct {
 }
 
 func (t *finder) Channel() {
+	msg := Database.db.Channel.FindUnique()
 }
 
 func (t *finder) Message() {
