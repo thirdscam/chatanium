@@ -1,6 +1,8 @@
 package Database
 
 import (
+	"time"
+
 	db "antegr.al/chatanium-bot/v1/src/Database/Internal"
 	"antegr.al/chatanium-bot/v1/src/Util/Log"
 )
@@ -13,10 +15,15 @@ type Database struct {
 // Establish database connection. and, database must connected before start modules.
 func (t *Database) Start() {
 	client := db.NewClient()
+	start := time.Now()
+
 	if err := client.Prisma.Connect(); err != nil {
 		Log.Error.Fatalf("Failed to connect to database: %v", err)
 	}
-	Log.Info.Println("Connected to database.")
+
+	elapsed := time.Since(start)
+
+	Log.Info.Printf("Connected to database. (took %s)", elapsed.Truncate(time.Millisecond))
 	t.Client = client
 }
 
