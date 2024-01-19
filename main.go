@@ -1,9 +1,7 @@
 package main
 
 import (
-	"os"
-
-	"antegr.al/chatanium-bot/v1/src/Backends/Discord"
+	Database "antegr.al/chatanium-bot/v1/src/Database"
 	util "antegr.al/chatanium-bot/v1/src/Util"
 	"antegr.al/chatanium-bot/v1/src/Util/Log"
 )
@@ -18,23 +16,18 @@ func main() {
 	Log.Info.Println("Antegral/Chatanium: Scalable Bot Management System")
 	Log.Info.Println("Press CTRL+C to shutdown.")
 
-	// Example: Ignite Backend for 3 steps
-	// Database := Ignite.DB{}   // 1. Prepare
-	// db := Database.Start()    // 2. Start
-	// defer Database.Shutdown() // 3. Shutdown
-
 	// Ignite Database
-	Database := Ignite.DB{}
-	db := Database.Start()
-	defer Database.Shutdown()
+	database := Database.Database{}
+	database.Start()
+	defer database.Shutdown()
 
 	// Ignite Discord
-	Discord := Ignite.Discord{
-		Database: db,
-		Token:    os.Getenv("DISCORD_TOKEN"),
-	}
-	Discord.Start()
-	defer Discord.Shutdown()
+	// Discord := Ignite.Discord{
+	// 	Database: database.Client,
+	// 	Token:    os.Getenv("DISCORD_TOKEN"),
+	// }
+	// Discord.Start()
+	// defer Discord.Shutdown()
 
 	// Wait for a signal to shutdown
 	util.WaitSignal()
