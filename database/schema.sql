@@ -1,97 +1,105 @@
-CREATE TABLE chatanium.attechments
+create table if not exists users
 (
-    "id"       bigint NOT NULL,
-    message_id bigint NOT NULL,
-    content    text NOT NULL,
-    CONSTRAINT PK_1 PRIMARY KEY ( "id" )
+    id         bigint    not null,
+    username   char(32)  not null,
+    created_at timestamp not null,
+    deleted_at timestamp,
+    constraint pk_7
+        primary key (id)
 );
 
-CREATE TABLE chatanium.channels
+create table if not exists guilds
 (
-    "id"            bigint NOT NULL,
-    guild_id        bigint NOT NULL,
-    name            varchar(25) NOT NULL,
-    description     varchar(1000) NULL,
-    created_at      timestamp NOT NULL,
-    deleted_at      timestamp NULL,
-    CONSTRAINT PK_2 PRIMARY KEY ( "id" )
+    id       bigint       not null,
+    name     varchar(100) not null,
+    owner_id bigint       not null,
+    constraint pk_3
+        primary key (id),
+    constraint fk_2
+        foreign key (owner_id) references users
 );
 
-CREATE TABLE chatanium.guilds
+create table if not exists channels
 (
-    "id"       bigint NOT NULL,
-    name       varchar(100) NOT NULL,
-    owner_id   bigint NOT NULL,
-    CONSTRAINT PK_3 PRIMARY KEY ( "id" )
+    id          bigint      not null,
+    guild_id    bigint      not null,
+    name        varchar(25) not null,
+    description varchar(1000),
+    created_at  timestamp   not null,
+    deleted_at  timestamp,
+    constraint pk_2
+        primary key (id),
+    constraint fk_7
+        foreign key (guild_id) references guilds
 );
 
-CREATE TABLE chatanium.guildUsers
+create table if not exists guildusers
 (
-    uuid       uuid NOT NULL,
-    guild_id   bigint NOT NULL,
-    user_id    bigint NOT NULL,
-    created_at timestamp NOT NULL,
-    quit_at    timestamp NULL,
-    CONSTRAINT PK_4 PRIMARY KEY ( uuid )
+    guild_id   bigint      not null,
+    created_at timestamp   not null,
+    quit_at    timestamp,
+    user_id    bigint      not null,
+    nickname   varchar(32) not null,
+    uuid       uuid        not null,
+    constraint pk_4
+        primary key (uuid),
+    constraint fk_3
+        foreign key (guild_id) references guilds,
+    constraint fk_4
+        foreign key (user_id) references users
 );
 
-CREATE TABLE chatanium.kvStorages
+create table if not exists kvstorages
 (
-    user_id     bigint NOT NULL,
-    key         text NOT NULL,
-    value       text NOT NULL,
-    CONSTRAINT  PK_5 PRIMARY KEY ( user_id )
+    user_id bigint not null,
+    key     text   not null,
+    value   text   not null,
+    constraint pk_5
+        primary key (user_id),
+    constraint fk_6
+        foreign key (user_id) references users
 );
 
-CREATE TABLE chatanium.messages
+create table if not exists messages
 (
-    message_id   bigint NOT NULL,
-    type         smallint NOT NULL,
-    guild_id     bigint NULL,
-    channel_id   bigint NULL,
-    user_id      bigint NOT NULL,
-    contents     text NULL,
-    reference_id bigint NULL,
-    created_at   timestamp NOT NULL,
-    CONSTRAINT   PK_6 PRIMARY KEY ( message_id )
+    message_id   bigint    not null,
+    type         smallint  not null,
+    guild_id     bigint,
+    channel_id   bigint,
+    user_id      bigint    not null,
+    contents     text,
+    reference_id bigint,
+    created_at   timestamp not null,
+    constraint pk_6
+        primary key (message_id),
+    constraint fk_4
+        foreign key (guild_id) references guilds,
+    constraint fk_5
+        foreign key (user_id) references users,
+    constraint fk_10
+        foreign key (channel_id) references channels
 );
 
-CREATE TABLE chatanium.users
+create table if not exists attechments
 (
-    "id"       bigint NOT NULL,
-    username   char(32) NOT NULL,
-    created_at timestamp NOT NULL,
-    deleted_at timestamp NULL,
-    CONSTRAINT PK_7 PRIMARY KEY ( "id" )
+    id         bigint not null,
+    message_id bigint not null,
+    content    text   not null,
+    constraint pk_1
+        primary key (id),
+    constraint fk_9
+        foreign key (message_id) references messages
 );
 
-CREATE TABLE chatanium.moduleACL
+create table if not exists moduleacl
 (
-    guild_id        bigint NOT NULL,
-    allowed_modules text[] NOT NULL,
-    CONSTRAINT      PK_8 PRIMARY KEY ( guild_id )
+    guild_id        bigint not null,
+    allowed_modules text[] not null,
+    constraint pk_8
+        primary key (guild_id),
+    constraint fk_10_1
+        foreign key (guild_id) references guilds
 );
 
-
-ALTER TABLE chatanium.attechments
-ADD CONSTRAINT FK_9 FOREIGN KEY ( message_id ) REFERENCES chatanium.messages ( message_id );
-
-ALTER TABLE chatanium.channels
-ADD CONSTRAINT FK_7 FOREIGN KEY ( guild_id ) REFERENCES chatanium.guilds ( "id" );
-
-ALTER TABLE chatanium.guilds
-ADD CONSTRAINT FK_2 FOREIGN KEY ( owner_id ) REFERENCES chatanium.users ( "id" );
-
-ALTER TABLE chatanium.guildUsers
-ADD CONSTRAINT FK_3 FOREIGN KEY ( guild_id ) REFERENCES chatanium.guilds ( "id" );
-
-ALTER TABLE chatanium.kvStorages
-ADD CONSTRAINT FK_6 FOREIGN KEY ( user_id ) REFERENCES chatanium.users ( "id" );
-
-ALTER TABLE chatanium.messages
-    ADD CONSTRAINT FK_4 FOREIGN KEY ( guild_id ) REFERENCES chatanium.guilds ( "id" ),
-    ADD CONSTRAINT FK_5 FOREIGN KEY ( user_id ) REFERENCES chatanium.users ( "id" ),
-    ADD CONSTRAINT FK_10 FOREIGN KEY ( channel_id ) REFERENCES chatanium.channels ( "id" );
-
-ALTER TABLE chatanium.moduleACL
-ADD CONSTRAINT FK_10_1 FOREIGN KEY ( guild_id ) REFERENCES chatanium.guilds ( "id" );
+-- comments
+comment on column guildusers.user_id is 'ID for User';
