@@ -98,7 +98,7 @@ type Guild struct {
 	// Discord session from discordgo
 	Client *discordgo.Session
 	// Store CommandManager for each guild
-	CmdMgrs []CommandManager
+	cmdMgrs []CommandManager
 }
 
 // Register slash commands to guild.
@@ -107,28 +107,28 @@ func (t *Guild) OnGuildCreated(id string) {
 	// TODO(Feature): ACL of slash commands for each guild
 
 	// 1. Make CommandManager for guild
-	CmdMgr := CommandManager{
+	cmdMgrs := CommandManager{
 		Client:   t.Client,
 		Commands: getCommands(id),
 		GuildID:  id,
 	}
 
 	// 2. Start CommandManager
-	CmdMgr.Start()
+	cmdMgrs.Start()
 
 	// 3. Append to CommandManager storage
-	t.CmdMgrs = append(t.CmdMgrs, CmdMgr)
+	t.cmdMgrs = append(t.cmdMgrs, cmdMgrs)
 }
 
 // Remove slash commands from guild.
 // This function used on guild delete event.
 func (t *Guild) OnGuildDeleted(id string) {
-	for i, v := range t.CmdMgrs {
+	for i, v := range t.cmdMgrs {
 		if v.GuildID == id {
 			// FIXME(Performance): remove CommandManager for lefted guild nevertheless handler goroutine is may running,
 			// so this goroutine maybe not stopped. The current way to fix this is to periodically restart
 			// the server to remove handlers for guilds that have lefted.
-			t.CmdMgrs = append(t.CmdMgrs[:i], t.CmdMgrs[i+1:]...)
+			t.cmdMgrs = append(t.cmdMgrs[:i], t.cmdMgrs[i+1:]...)
 			break
 		}
 	}
