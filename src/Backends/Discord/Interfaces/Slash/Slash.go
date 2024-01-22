@@ -96,7 +96,7 @@ func (t *CommandManager) vaildate() {
 	// Compare from each stored commands and registered commands.
 	st, err := t.Client.Guild(t.GuildID)
 	if err != nil {
-		Log.Error.Fatalf("%s: Cannot get guild: %v", t.GuildID, err)
+		Log.Error.Fatalf("G:%s > Cannot get guild: %v", t.GuildID, err)
 	}
 
 	// 1. Get registered commands from discord
