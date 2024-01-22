@@ -1,6 +1,9 @@
 package Slash
 
 import (
+	"fmt"
+	"reflect"
+
 	"antegr.al/chatanium-bot/v1/src/Util/Log"
 	"github.com/bwmarrin/discordgo"
 )
@@ -88,9 +91,35 @@ func (t *CommandManager) unloadCommand() {
 	t.Remove(t.Commands)
 }
 
+// Vaildate schema of commands.
 func (t *CommandManager) vaildate() {
-	Log.Verbose.Printf("%s > Shutdown CommandManager...", t.GuildID)
-	t.unloadCommand()
+	// Compare from each stored commands and registered commands.
+	st, err := t.Client.Guild(t.GuildID)
+	if err != nil {
+		Log.Error.Fatalf("%s: Cannot get guild: %v", t.GuildID, err)
+	}
+
+	// 1. Get registered commands from discord
+	cmd, err := t.Client.ApplicationCommands(t.Client.State.User.ID, st.ID)
+	if err != nil {
+		Log.Error.Fatalf("G:%s > Cannot get slash commands: %v", t.GuildID, err)
+	}
+
+	// 2. Get stored commands and registered commands.
+	remote := make(map[string]string, len(cmd))
+	for _, ac := range cmd {
+		remote[ac.Name] = fmt.Sprintf("%+v", ac)
+	}
+
+	local := make(map[string]string, len(t.Commands))
+	for schema := range t.Commands {
+		local[schema.Name] = fmt.Sprintf("%+v", schema)
+	}
+
+	result := reflect.DeepEqual(remote, local)
+	if result == false {
+		Log.Warn.Fatalf("[Integrity] G:%s > Stored commands and registered commands are not same. Please check this guild commands.", t.GuildID)
+	}
 }
 
 // Manage and store CommandManager for each guild.
