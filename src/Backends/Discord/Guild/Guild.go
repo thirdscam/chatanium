@@ -13,6 +13,7 @@ func Handle(client *discordgo.Session, db *db.PrismaClient) {
 		Client: client,
 	}
 
+	// Guild Events
 	client.AddHandler(func(s *discordgo.Session, g *discordgo.GuildCreate) {
 		Log.Verbose.Printf("Join Guild: %v (%v)", g.Name, g.ID)
 		Database.RegisterGuild(client, db, g.ID, g.OwnerID) // Register guild to database

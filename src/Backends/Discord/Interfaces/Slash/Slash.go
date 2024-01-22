@@ -20,7 +20,7 @@ type CommandManager struct {
 }
 
 func (t *CommandManager) Start() {
-	Log.Verbose.Printf("%s > Adding schemas...", t.GuildID)
+	Log.Verbose.Printf("G:%s > Adding schemas...", t.GuildID)
 
 	// 1. Register commands to discord (only schema. handler is not registered)
 	for schema := range t.Commands {
@@ -30,7 +30,7 @@ func (t *CommandManager) Start() {
 		}
 	}
 
-	Log.Verbose.Printf("%s > Starting CommandManager...", t.GuildID)
+	Log.Verbose.Printf("G:%s > Starting CommandManager...", t.GuildID)
 
 	// 2. Handle for slash commands when user input
 	t.Client.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -50,7 +50,7 @@ func (t *CommandManager) Start() {
 
 // Add command to command manager.
 func (t *CommandManager) Add(cmd Commands) {
-	Log.Verbose.Printf("%s > Adding commands...", t.GuildID)
+	Log.Verbose.Printf("G:%s > Adding commands...", t.GuildID)
 
 	// 1. Add command to discord (register command)
 	for schema := range cmd {
@@ -69,7 +69,7 @@ func (t *CommandManager) Add(cmd Commands) {
 
 // Remove command from command manager.
 func (t *CommandManager) Remove(cmd Commands) {
-	Log.Verbose.Printf("%s > Removing commands...", t.GuildID)
+	Log.Verbose.Printf("G:%s > Removing commands...", t.GuildID)
 
 	// 1. Remove command from discord (unregister command)
 	for schema := range cmd {
@@ -87,7 +87,7 @@ func (t *CommandManager) Remove(cmd Commands) {
 
 // Remove all command from command manager.
 func (t *CommandManager) unloadCommand() {
-	Log.Verbose.Printf("%s > Unloading commands...", t.GuildID)
+	Log.Verbose.Printf("G:%s > Unloading commands...", t.GuildID)
 	t.Remove(t.Commands)
 }
 
