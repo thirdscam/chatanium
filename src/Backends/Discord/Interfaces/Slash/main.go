@@ -117,9 +117,12 @@ func (t *CommandManager) vaildate() {
 		local[schema.Name] = fmt.Sprintf("%+v", schema)
 	}
 
+	// 3. Compare stored commands and registered commands.
 	result := reflect.DeepEqual(remote, local)
 	if result == false {
 		Log.Warn.Printf("[Integrity] G:%s > Stored commands and registered commands are not same. Please check this guild commands.", t.GuildID)
+
+		// 3-1. If recovery mode is enabled, re-register commands.
 		if os.Getenv("CHATANIUM_RECOVERY") == "true" {
 			Log.Warn.Printf("[Integrity/Recovery] %s > Re-registering commands...", t.GuildID)
 			t.unloadCommand()

@@ -7,8 +7,6 @@ import (
 )
 
 func LogMessage(client *discordgo.Session, database *db.PrismaClient) {
-	// TODO: Database (actions)
-
 	// Handle all messages from all guilds
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
 		createMessage(s, m, database)
@@ -28,7 +26,6 @@ func LogMessage(client *discordgo.Session, database *db.PrismaClient) {
 
 func Member(client *discordgo.Session, dbClient *db.PrismaClient) {
 	// TODO: Database (Save Message, actions)
-
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
 		Log.Verbose.Printf("MEMBER/JOIN (%v) %v", m.GuildID, m.Nick)
 	})
