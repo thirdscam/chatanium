@@ -151,7 +151,9 @@ type Guild struct {
 	cmdMgrs []CommandManager
 }
 
+// Start slash command interface.
 func (t *Guild) Start() {
+	// Add handler for slash command event (InteractionCreate)
 	t.Client.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		// 1. Get guild ID from interaction
 		guildId := i.GuildID

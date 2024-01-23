@@ -15,6 +15,7 @@ func Handle(client *discordgo.Session, db *db.PrismaClient) {
 	slash := slash.Guild{
 		Client: client,
 	}
+	slash.Start() // Start slash command manager
 
 	/******************** Guild Events ********************/
 	client.AddHandler(func(s *discordgo.Session, g *discordgo.GuildCreate) {
