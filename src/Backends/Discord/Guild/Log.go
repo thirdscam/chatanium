@@ -1,6 +1,7 @@
 package Guild
 
 import (
+	"antegr.al/chatanium-bot/v1/src/Backends/Discord/Database"
 	db "antegr.al/chatanium-bot/v1/src/Database/Internal"
 	"antegr.al/chatanium-bot/v1/src/Util/Log"
 	"github.com/bwmarrin/discordgo"
@@ -9,17 +10,17 @@ import (
 func LogMessage(client *discordgo.Session, database *db.PrismaClient) {
 	// Handle all messages from all guilds
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
-		createMessage(s, m, database)
+		Database.CreateMessage(s, m, database)
 		Log.Verbose.Printf("G:%v | C:%v > %v: %v", m.GuildID, m.ChannelID, m.Author.Username, m.Content)
 	})
 
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.MessageUpdate) {
-		updateMessage(s, m, database)
+		Database.UpdateMessage(s, m, database)
 		Log.Verbose.Printf("G:%v | C:%v > Update M:%v > %v", m.GuildID, m.ChannelID, m.Message.ID, m.Content)
 	})
 
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.MessageDelete) {
-		deleteMessage(s, m, database)
+		Database.DeleteMessage(s, m, database)
 		Log.Verbose.Printf("G:%v | C:%v > Delete M:%v", m.GuildID, m.ChannelID, m.ID)
 	})
 }

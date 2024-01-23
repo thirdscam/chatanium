@@ -37,17 +37,17 @@ func Handle(client *discordgo.Session, db *db.PrismaClient) {
 
 	/******************** Chat Events ********************/
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
-		createMessage(s, m, db)
+		Database.CreateMessage(s, m, db)
 		Log.Verbose.Printf("G:%v | C:%v > %v: %v", m.GuildID, m.ChannelID, m.Author.Username, m.Content)
 	})
 
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.MessageUpdate) {
-		updateMessage(s, m, db)
+		Database.UpdateMessage(s, m, db)
 		Log.Verbose.Printf("G:%v | C:%v > Update M:%v > %v", m.GuildID, m.ChannelID, m.Message.ID, m.Content)
 	})
 
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.MessageDelete) {
-		deleteMessage(s, m, db)
+		Database.DeleteMessage(s, m, db)
 		Log.Verbose.Printf("G:%v | C:%v > Delete M:%v", m.GuildID, m.ChannelID, m.ID)
 	})
 
