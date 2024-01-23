@@ -9,13 +9,14 @@ import (
 )
 
 // Handle all events from guild.
+// This function is used for entry point of discord backend.
 func Handle(client *discordgo.Session, db *db.PrismaClient) {
-	// Interfaces
+	/******************** Interfaces ********************/
 	slash := slash.Guild{
 		Client: client,
 	}
 
-	// Guild Events
+	/******************** Guild Events ********************/
 	client.AddHandler(func(s *discordgo.Session, g *discordgo.GuildCreate) {
 		Log.Verbose.Printf("Join Guild: %v (%v)", g.Name, g.ID)
 		Database.RegisterGuild(client, db, g.ID, g.OwnerID) // Register guild to database
@@ -33,7 +34,7 @@ func Handle(client *discordgo.Session, db *db.PrismaClient) {
 		// slash.OnGuildUpdated(g.ID) // TODO(Feature): Update slash commands
 	})
 
-	// Chat Events
+	/******************** Chat Events ********************/
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
 		createMessage(s, m, db)
 		Log.Verbose.Printf("G:%v | C:%v > %v: %v", m.GuildID, m.ChannelID, m.Author.Username, m.Content)
@@ -49,7 +50,7 @@ func Handle(client *discordgo.Session, db *db.PrismaClient) {
 		Log.Verbose.Printf("G:%v | C:%v > Delete M:%v", m.GuildID, m.ChannelID, m.ID)
 	})
 
-	// Member Events
+	/******************** Member Events ********************/
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
 		Log.Verbose.Printf("MEMBER/JOIN (%v) %v", m.GuildID, m.Nick)
 	})

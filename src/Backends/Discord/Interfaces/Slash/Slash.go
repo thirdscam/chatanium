@@ -2,6 +2,7 @@ package Slash
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 
 	"antegr.al/chatanium-bot/v1/src/Util/Log"
@@ -118,7 +119,13 @@ func (t *CommandManager) vaildate() {
 
 	result := reflect.DeepEqual(remote, local)
 	if result == false {
-		Log.Warn.Fatalf("[Integrity] G:%s > Stored commands and registered commands are not same. Please check this guild commands.", t.GuildID)
+		Log.Warn.Printf("[Integrity] G:%s > Stored commands and registered commands are not same. Please check this guild commands.", t.GuildID)
+		if os.Getenv("CHATANIUM_RECOVERY") == "true" {
+			Log.Warn.Printf("[Integrity/Recovery] %s > Re-registering commands...", t.GuildID)
+			t.unloadCommand()
+			t.Add(t.Commands)
+			Log.Warn.Printf("[Integrity/Recovery] %s > Completed.", t.GuildID)
+		}
 	}
 }
 
