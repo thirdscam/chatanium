@@ -33,20 +33,20 @@ func (t *CommandManager) Start() {
 
 	Log.Verbose.Printf("G:%s > Starting CommandManager...", t.GuildID)
 
-	// 2. Handle for slash commands when user input
-	t.Client.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		// 2-1. Retrieve command name from interaction (input from user)
-		reqCmd := i.ApplicationCommandData().Name
+	// // 2. Handle for slash commands when user input
+	// t.Client.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	// 	// 2-1. Retrieve command name from interaction (input from user)
+	// 	reqCmd := i.ApplicationCommandData().Name
 
-		// 2-2. search command name from registered commands
-		//      if command name is not found, ignore this event
-		for schema, handle := range t.Commands {
-			if schema.Name == reqCmd { // schema.Name is command name
-				handle(s, i) // call handler
-				break
-			}
-		}
-	})
+	// 	// 2-2. search command name from registered commands
+	// 	//      if command name is not found, ignore this event
+	// 	for schema, handle := range t.Commands {
+	// 		if schema.Name == reqCmd { // schema.Name is command name
+	// 			handle(s, i) // call handler
+	// 			break
+	// 		}
+	// 	}
+	// })
 }
 
 // Add command to command manager.
@@ -129,12 +129,48 @@ func (t *CommandManager) vaildate() {
 	}
 }
 
+func (t *CommandManager) HandleCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	// 1. Retrieve command name from interaction (input from user)
+	reqCmd := i.ApplicationCommandData().Name
+
+	// 2. search command name from registered commands
+	//    if command name is not found, ignore this event
+	for schema, handle := range t.Commands {
+		if schema.Name == reqCmd { // schema.Name is command name
+			handle(s, i) // call handler
+			break
+		}
+	}
+}
+
 // Manage and store CommandManager for each guild.
 type Guild struct {
 	// Discord session from discordgo
 	Client *discordgo.Session
 	// Store CommandManager for each guild
 	cmdMgrs []CommandManager
+}
+
+func (t *Guild) Start() {
+	t.Client.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		// 1. Get guild ID from interaction
+		guildId := i.GuildID
+		isFindCmdMgr := false
+
+		// 2. Search CommandManager for guild
+		for _, v := range t.cmdMgrs {
+			if v.GuildID == guildId {
+				// 2-1. Excute command: but if command is not found, ignore this event
+				isFindCmdMgr = true
+				v.HandleCommand(s, i)
+				break
+			}
+		}
+
+		if isFindCmdMgr == false {
+			Log.Warn.Printf("[Integrity] G:%s > Cannot find CommandManager for this guild. Please check this guild.", guildId)
+		}
+	})
 }
 
 // Register slash commands to guild.
