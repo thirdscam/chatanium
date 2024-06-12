@@ -31,4 +31,9 @@ func InsertUser(database *db.PrismaClient, uid string, username string) {
 		Users.Username.Set(username),
 		Users.CreatedAt.Set(time.Now()),
 	).Exec(ctx)
+	if err != nil {
+		Log.Error.Panicf("U:%s (%s) > Failed to register user: %v", uid, username, err)
+		// Log.Verbose.Printf("U:%s (%s) > User already exists.", uid, username)
+		return
+	}
 }

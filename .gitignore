@@ -4,3 +4,4 @@ __debug_bin
 /src/Database/Internal/**/*
 /src/__debug
 **/__debug*
+.vscode/**/*
