@@ -12,21 +12,21 @@ import (
 // This function is used for entry point of discord backend.
 func Handle(client *discordgo.Session, db *db.PrismaClient) {
 	/******************** Interfaces ********************/
-	slash := slash.Guild{
+	Slash := slash.Guild{
 		Client: client,
 	}
-	slash.Start() // Start slash command manager
+	Slash.Start() // Start slash command manager
 
 	/******************** Guild Events ********************/
 	client.AddHandler(func(s *discordgo.Session, g *discordgo.GuildCreate) {
 		Log.Verbose.Printf("Join Guild: %v (%v)", g.Name, g.ID)
 		Database.RegisterGuild(client, db, g.ID, g.OwnerID) // Register guild to database
-		slash.OnGuildCreated(g.ID)                          // Register slash commands
+		Slash.OnGuildCreated(g.ID)                          // Register slash commands
 	})
 
 	client.AddHandler(func(s *discordgo.Session, g *discordgo.GuildDelete) {
 		Log.Verbose.Printf("Left Guild: %v (%v)", g.Name, g.ID)
-		slash.OnGuildDeleted(g.ID) // Remove slash commands
+		Slash.OnGuildDeleted(g.ID) // Remove slash commands
 	})
 
 	client.AddHandler(func(s *discordgo.Session, g *discordgo.GuildUpdate) {

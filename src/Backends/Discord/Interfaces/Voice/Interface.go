@@ -2,7 +2,6 @@ package Voice
 
 import (
 	"errors"
-	"math/rand"
 
 	"antegr.al/chatanium-bot/v1/src/Util/Log"
 	"github.com/bwmarrin/dgvoice"
