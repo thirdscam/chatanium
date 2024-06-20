@@ -2,6 +2,8 @@ package Voice
 
 import (
 	"errors"
+	"sync"
+	"time"
 
 	"antegr.al/chatanium-bot/v1/src/Util/Log"
 	"github.com/bwmarrin/dgvoice"
@@ -41,17 +43,19 @@ func (t *Voice) Read() chan *discordgo.Packet {
 // it locked by another module, the another module can't write voice channel.
 func (t *Voice) Write(pcm <-chan []int16) error {
 	if t.isLocked {
-		return errors.New("this voice channel is already used by another module.")
+		return errors.New("this voice channel is already used by another module")
 	}
 
-	// start to write voice channel, it should be locked
-	t.lock()
+	go func() {
+		// start to write voice channel, it should be locked
+		t.lock()
 
-	// write voice channel
-	dgvoice.SendPCM(t.conn, pcm)
+		// write voice channel
+		dgvoice.SendPCM(t.conn, pcm)
 
-	// if stream is closed, unlock voice channel
-	t.unlock()
+		// if stream is closed, unlock voice channel
+		t.unlock()
+	}()
 
 	return nil
 }
@@ -77,7 +81,7 @@ func (t *Voice) newBroadcastChan() {
 
 			// if no listener, close broadcast channel
 			if len(t.listenerChan) == 0 {
-				Log.Info.Printf("G:%s C:%s > starting broadcast voice channel...", t.conn.GuildID, t.conn.ChannelID)
+				Log.Info.Printf("G:%s C:%s > closing broadcast voice channel...", t.conn.GuildID, t.conn.ChannelID)
 				close(t.broadcastChan)
 			}
 
@@ -85,7 +89,28 @@ func (t *Voice) newBroadcastChan() {
 			if incoming {
 				// copy data to listeners
 				for _, ch := range t.listenerChan {
-					ch <- data
+					// check timeout for listener
+					var wg sync.WaitGroup
+					wg.Add(1)
+					go func() {
+						defer wg.Done()
+						for {
+							select {
+							case ch <- data:
+								return
+							case <-time.After(1000 * time.Millisecond):
+								Log.Warn.Printf("The listener is too lazy, so closed the channel for the listener. (it tooks >1000ms)")
+								close(ch)
+								for i, e := range t.listenerChan {
+									if ch == e {
+										t.listenerChan = append(t.listenerChan[:i], t.listenerChan[i+1:]...)
+									}
+								}
+								return
+							}
+						}
+					}()
+					wg.Wait()
 				}
 			} else {
 				for _, ch := range t.listenerChan {
