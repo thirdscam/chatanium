@@ -6,7 +6,6 @@ import (
 	"log"
 	"time"
 
-	"antegr.al/chatanium-bot/v1/src/Database/Internal"
 	db "antegr.al/chatanium-bot/v1/src/Database/Internal"
 	util "antegr.al/chatanium-bot/v1/src/Util"
 	"antegr.al/chatanium-bot/v1/src/Util/Log"
@@ -14,7 +13,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func RegisterGuild(client *discordgo.Session, dbconn *sql.DB, queries *Internal.Queries, id, ownerID string) {
+func RegisterGuild(client *discordgo.Session, dbconn *sql.DB, queries *db.Queries, id, ownerID string) {
 	Log.Verbose.Printf("G:%s > Adding database...", id)
 
 	// Search owner username by owner id
@@ -98,92 +97,31 @@ func RegisterGuild(client *discordgo.Session, dbconn *sql.DB, queries *Internal.
 }
 
 // InsertUser inserts user information into the database
-func InsertUser(dbConn *sql.DB, uid, username string) {
-	ctx := context.Background()
-	queries := db.New(dbConn)
-
+func InsertUser(queries *db.Queries, uid, username string) {
 	// Check if user already exists
-	_, err := queries.GetUser(ctx, util.Str2Int64(uid))
+	_, err := queries.GetUser(context.Background(), util.Str2Int64(uid))
 	if err == nil {
 		// User already exists
 		return
 	} else if err != sql.ErrNoRows {
-		log.Fatalf("Failed to find user: %v", err)
+		Log.Error.Fatalf("Failed to find user: %v", err)
 	}
 
 	// Insert user
-	err = queries.InsertUser(ctx, db.InsertUserParams{
-		ID:        util.Str2Int64(uid),
-		Username:  username,
-		CreatedAt: time.Now(),
+	err = queries.InsertUser(context.Background(), db.InsertUserParams{
+		ID:       util.Str2Int64(uid),
+		Username: username,
 	})
 	if err != nil {
-		log.Fatalf("Failed to insert user: %v", err)
+		Log.Error.Fatalf("Failed to insert user: %v", err)
 	}
-	log.Printf("U:%s > User insert completed.", uid)
-}
-
-// InsertGuild inserts guild information into the database
-func InsertGuild(dbConn *sql.DB, gid, name, ownerUid string) {
-	ctx := context.Background()
-	queries := db.New(dbConn)
-
-	// Check if guild already exists
-	_, err := queries.GetGuild(ctx, util.Str2Int64(gid))
-	if err == nil {
-		// Guild already exists
-		return
-	} else if err != sql.ErrNoRows {
-		log.Fatalf("Failed to find guild: %v", err)
-	}
-
-	// Insert guild
-	err = queries.InsertGuild(ctx, db.InsertGuildParams{
-		ID:      util.Str2Int64(gid),
-		Name:    name,
-		OwnerID: util.Str2Int64(ownerUid),
-	})
-	if err != nil {
-		log.Fatalf("Failed to insert guild: %v", err)
-	}
-	log.Printf("G:%s > Guild insert completed.", gid)
-}
-
-// InsertChannel inserts channel information into the database
-func InsertChannel(dbConn *sql.DB, cid, gid, name, description string) bool {
-	ctx := context.Background()
-	queries := db.New(dbConn)
-
-	// Check if channel already exists
-	_, err := queries.GetChannel(ctx, util.Str2Int64(cid))
-	if err == nil {
-		// Channel already exists
-		return false
-	} else if err != sql.ErrNoRows {
-		log.Fatalf("Failed to find channel: %v", err)
-	}
-
-	// Insert channel
-	err = queries.InsertChannel(ctx, db.InsertChannelParams{
-		ID:        util.Str2Int64(cid),
-		GuildID:   util.Str2Int64(gid),
-		Name:      name,
-		CreatedAt: time.Now(),
-	})
-	if err != nil {
-		log.Fatalf("Failed to insert channel: %v", err)
-	}
-	log.Printf("G:%s | C:%s > Channel insert completed.", gid, cid)
-	return true
+	Log.Verbose.Printf("U:%s > User insert completed.", uid)
 }
 
 // InsertMember inserts member information into the database
-func InsertMember(dbConn *sql.DB, uid, gid, nickname string) bool {
-	ctx := context.Background()
-	queries := db.New(dbConn)
-
+func InsertMember(queries *db.Queries, uid, gid, nickname string) bool {
 	// Check if guild user already exists
-	_, err := queries.GetGuildUser(ctx, db.GetGuildUserParams{
+	_, err := queries.GetGuildUser(context.Background(), db.GetGuildUserParams{
 		UserID:  util.Str2Int64(uid),
 		GuildID: util.Str2Int64(gid),
 	})
@@ -198,8 +136,8 @@ func InsertMember(dbConn *sql.DB, uid, gid, nickname string) bool {
 
 	// Insert guild user
 	newUUID := uuid.New().String()
-	err = queries.InsertGuildUser(ctx, db.InsertGuildUserParams{
-		UUID:      newUUID,
+	err = queries.InsertGuildUser(context.Background(), db.InsertGuildUserParams{
+		Uuid:      newUUID,
 		GuildID:   util.Str2Int64(gid),
 		UserID:    util.Str2Int64(uid),
 		CreatedAt: time.Now(),
@@ -211,6 +149,95 @@ func InsertMember(dbConn *sql.DB, uid, gid, nickname string) bool {
 	log.Printf("G:%s | U:%s > Member insert completed. (%s)", gid, uid, nickname)
 	return true
 }
+
+// // InsertGuild inserts guild information into the database
+// func InsertGuild(dbConn *sql.DB, gid, name, ownerUid string) {
+// 	ctx := context.Background()
+// 	queries := db.New(dbConn)
+
+// 	// Check if guild already exists
+// 	_, err := queries.GetGuild(ctx, util.Str2Int64(gid))
+// 	if err == nil {
+// 		// Guild already exists
+// 		return
+// 	} else if err != sql.ErrNoRows {
+// 		log.Fatalf("Failed to find guild: %v", err)
+// 	}
+
+// 	// Insert guild
+// 	err = queries.InsertGuild(ctx, db.InsertGuildParams{
+// 		ID:      util.Str2Int64(gid),
+// 		Name:    name,
+// 		OwnerID: util.Str2Int64(ownerUid),
+// 	})
+// 	if err != nil {
+// 		Log.Error.Fatalf("Failed to insert guild: %v", err)
+// 	}
+// 	Log.Verbose.Printf("G:%s > Guild insert completed.", gid)
+// }
+
+// // InsertChannel inserts channel information into the database
+// func InsertChannel(dbConn *sql.DB, cid, gid, name, description string) bool {
+// 	ctx := context.Background()
+// 	queries := db.New(dbConn)
+
+// 	// Check if channel already exists
+// 	_, err := queries.GetChannel(ctx, util.Str2Int64(cid))
+// 	if err == nil {
+// 		// Channel already exists
+// 		return false
+// 	} else if err != sql.ErrNoRows {
+// 		Log.Error.Fatalf("Failed to find channel: %v", err)
+// 	}
+
+// 	// Insert channel
+// 	err = queries.InsertChannel(ctx, db.InsertChannelParams{
+// 		ID:        util.Str2Int64(cid),
+// 		GuildID:   util.Str2Int64(gid),
+// 		Name:      name,
+// 		CreatedAt: time.Now(),
+// 	})
+// 	if err != nil {
+// 		log.Fatalf("Failed to insert channel: %v", err)
+// 	}
+// 	log.Printf("G:%s | C:%s > Channel insert completed.", gid, cid)
+// 	return true
+// }
+
+// // InsertMember inserts member information into the database
+// func InsertMember(dbConn *sql.DB, uid, gid, nickname string) bool {
+// 	ctx := context.Background()
+// 	queries := db.New(dbConn)
+
+// 	// Check if guild user already exists
+// 	_, err := queries.GetGuildUser(ctx, db.GetGuildUserParams{
+// 		UserID:  util.Str2Int64(uid),
+// 		GuildID: util.Str2Int64(gid),
+// 	})
+// 	if err == nil {
+// 		// Guild user already exists
+// 		return false
+// 	} else if err != sql.ErrNoRows {
+// 		log.Fatalf("Failed to find guild user: %v", err)
+// 	}
+
+// 	log.Printf("G:%s | U:%s > Adding member... (%s)", gid, uid, nickname)
+
+// 	// Insert guild user
+// 	newUUID := uuid.New().String()
+// 	err = queries.InsertGuildUser(ctx, db.InsertGuildUserParams{
+// 		UUID:      newUUID,
+// 		GuildID:   util.Str2Int64(gid),
+// 		UserID:    util.Str2Int64(uid),
+// 		CreatedAt: time.Now(),
+// 		Nickname:  nickname,
+// 	})
+// 	if err != nil {
+// 		log.Fatalf("Failed to insert guild user: %v", err)
+// 	}
+// 	log.Printf("G:%s | U:%s > Member insert completed. (%s)", gid, uid, nickname)
+// 	return true
+// }
 
 // TODO(feature): Updata guild information to database
 func UpdateGuild() {
