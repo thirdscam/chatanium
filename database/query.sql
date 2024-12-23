@@ -29,3 +29,24 @@ SELECT id, guild_id, name, description, created_at, deleted_at FROM channels WHE
 -- name: InsertChannel :exec
 INSERT INTO channels (id, guild_id, name, created_at)
 VALUES (?, ?, ?, ?);
+
+-- name: GetMessage :one
+SELECT message_id, type, guild_id, channel_id, user_id, contents, reference_id, created_at 
+FROM messages 
+WHERE message_id = ?;
+
+-- name: InsertMessage :exec
+INSERT INTO messages (
+    message_id,
+    type,
+    guild_id,
+    channel_id,
+    user_id,
+    contents,
+    reference_id,
+    created_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+-- name: DeleteMessage :exec
+DELETE FROM messages 
+WHERE message_id = ?;
