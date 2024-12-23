@@ -14,7 +14,7 @@ import (
 
 func GetMessageInfo(gid, mid string, database *db.PrismaClient) *db.MessagesModel {
 	msg, err := database.Messages.FindUnique(
-		db.Messages.MessageID.Equals(util.StringToBigint(mid)),
+		db.Messages.MessageID.Equals(util.Str2Int64(mid)),
 	).With(
 		db.Messages.Users.Fetch(),
 	).Exec(
@@ -48,13 +48,13 @@ func CreateMessage(s *discordgo.Session, m *discordgo.MessageCreate, database *d
 	// Database Task: Insert message
 	Msg := db.Messages
 	_, err := database.Messages.CreateOne(
-		Msg.MessageID.Set(util.StringToBigint(m.ID)),
+		Msg.MessageID.Set(util.Str2Int64(m.ID)),
 		Msg.Type.Set(int(m.Type)),
 		Msg.CreatedAt.Set(m.Timestamp),
-		Msg.Users.Link(db.Users.ID.Equals(util.StringToBigint(m.Author.ID))),
+		Msg.Users.Link(db.Users.ID.Equals(util.Str2Int64(m.Author.ID))),
 		Msg.Contents.Set(m.Content),
-		Msg.Guilds.Link(db.Guilds.ID.Equals(util.StringToBigint(m.GuildID))),
-		Msg.Channels.Link(db.Channels.ID.Equals(util.StringToBigint(m.ChannelID))),
+		Msg.Guilds.Link(db.Guilds.ID.Equals(util.Str2Int64(m.GuildID))),
+		Msg.Channels.Link(db.Channels.ID.Equals(util.Str2Int64(m.ChannelID))),
 	).Exec(ctx)
 	if err != nil {
 		Log.Error.Printf("Failed to create message: %v", err)

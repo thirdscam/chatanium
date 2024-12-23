@@ -1,31 +1,31 @@
 package Guild
 
 import (
-	"antegr.al/chatanium-bot/v1/src/Backends/Discord/Database"
-	db "antegr.al/chatanium-bot/v1/src/Database/Internal"
+	backendDB "antegr.al/chatanium-bot/v1/src/Backends/Discord/Database"
+	"antegr.al/chatanium-bot/v1/src/Database"
 	"antegr.al/chatanium-bot/v1/src/Util/Log"
 	"github.com/bwmarrin/discordgo"
 )
 
-func LogMessage(client *discordgo.Session, database *db.PrismaClient) {
+func HandleMessageLog(client *discordgo.Session, db *Database.DB) {
 	// Handle all messages from all guilds
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
-		Database.CreateMessage(s, m, database)
+		backendDB.CreateMessage(s, m)
 		Log.Verbose.Printf("G:%v | C:%v > %v: %v", m.GuildID, m.ChannelID, m.Author.Username, m.Content)
 	})
 
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.MessageUpdate) {
-		Database.UpdateMessage(s, m, database)
+		backendDB.UpdateMessage(s, m, database)
 		Log.Verbose.Printf("G:%v | C:%v > Update M:%v > %v", m.GuildID, m.ChannelID, m.Message.ID, m.Content)
 	})
 
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.MessageDelete) {
-		Database.DeleteMessage(s, m, database)
+		backendDB.DeleteMessage(s, m, database)
 		Log.Verbose.Printf("G:%v | C:%v > Delete M:%v", m.GuildID, m.ChannelID, m.ID)
 	})
 }
 
-func Member(client *discordgo.Session, dbClient *db.PrismaClient) {
+func HandleMemberLog(client *discordgo.Session, db *Database.DB) {
 	// TODO: Database (Save Message, actions)
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
 		Log.Verbose.Printf("MEMBER/JOIN (%v) %v", m.GuildID, m.Nick)

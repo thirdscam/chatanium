@@ -5,10 +5,9 @@ import (
 	"math/big"
 
 	"antegr.al/chatanium-bot/v1/src/Util/Log"
-	"github.com/steebchen/prisma-client-go/runtime/types"
 )
 
-func StringToBigint(id string) types.BigInt {
+func Str2Int64(id string) int64 {
 	n := new(big.Int)
 	n, ok := n.SetString(id, 10)
 	if !ok {
@@ -16,5 +15,5 @@ func StringToBigint(id string) types.BigInt {
 		Log.Error.Fatalf("Failed to convert ID: %v", id)
 	}
 
-	return types.BigInt(n.Int64())
+	return n.Int64()
 }

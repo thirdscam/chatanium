@@ -1,32 +1,31 @@
 package Guild
 
 import (
-	"antegr.al/chatanium-bot/v1/src/Backends/Discord/Database"
-	slash "antegr.al/chatanium-bot/v1/src/Backends/Discord/Interfaces/Slash"
-	db "antegr.al/chatanium-bot/v1/src/Database/Internal"
+	backendDB "antegr.al/chatanium-bot/v1/src/Backends/Discord/Database"
+	"antegr.al/chatanium-bot/v1/src/Database"
 	"antegr.al/chatanium-bot/v1/src/Util/Log"
 	"github.com/bwmarrin/discordgo"
 )
 
 // Handle all events from guild.
 // This function is used for entry point of discord backend.
-func Handle(client *discordgo.Session, db *db.PrismaClient) {
+func Handle(client *discordgo.Session, db *Database.DB) {
 	/******************** Interfaces ********************/
-	Slash := slash.Guild{
-		Client: client,
-	}
-	Slash.Start() // Start slash command manager
+	// Slash := slash.Guild{
+	// 	Client: client,
+	// }
+	// Slash.Start() // Start slash command manager
 
 	/******************** Guild Events ********************/
 	client.AddHandler(func(s *discordgo.Session, g *discordgo.GuildCreate) {
 		Log.Verbose.Printf("Join Guild: %v (%v)", g.Name, g.ID)
-		Database.RegisterGuild(client, db, g.ID, g.OwnerID) // Register guild to database
-		Slash.OnGuildCreated(g.ID)                          // Register slash commands
+		backendDB.RegisterGuild(client, db.Conn, db.Queries, g.ID, g.OwnerID) // Register guild to database
+		// Slash.OnGuildCreated(g.ID)                          // Register slash commands
 	})
 
 	client.AddHandler(func(s *discordgo.Session, g *discordgo.GuildDelete) {
 		Log.Verbose.Printf("Left Guild: %v (%v)", g.Name, g.ID)
-		Slash.OnGuildDeleted(g.ID) // Remove slash commands
+		// Slash.OnGuildDeleted(g.ID) // Remove slash commands
 	})
 
 	client.AddHandler(func(s *discordgo.Session, g *discordgo.GuildUpdate) {
@@ -37,17 +36,17 @@ func Handle(client *discordgo.Session, db *db.PrismaClient) {
 
 	/******************** Chat Events ********************/
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
-		Database.CreateMessage(s, m, db)
+		backendDB.CreateMessage(s, m, db)
 		Log.Verbose.Printf("G:%v | C:%v > %v: %v", m.GuildID, m.ChannelID, m.Author.Username, m.Content)
 	})
 
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.MessageUpdate) {
-		Database.UpdateMessage(s, m, db)
+		backendDB.UpdateMessage(s, m, db)
 		Log.Verbose.Printf("G:%v | C:%v > Update M:%v > %v", m.GuildID, m.ChannelID, m.Message.ID, m.Content)
 	})
 
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.MessageDelete) {
-		Database.DeleteMessage(s, m, db)
+		backendDB.DeleteMessage(s, m, db)
 		Log.Verbose.Printf("G:%v | C:%v > Delete M:%v", m.GuildID, m.ChannelID, m.ID)
 	})
 

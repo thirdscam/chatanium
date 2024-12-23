@@ -2,9 +2,11 @@ package Database
 
 import (
 	"context"
-	"errors"
+	"database/sql"
+	"log"
 	"time"
 
+	"antegr.al/chatanium-bot/v1/src/Database/Internal"
 	db "antegr.al/chatanium-bot/v1/src/Database/Internal"
 	util "antegr.al/chatanium-bot/v1/src/Util"
 	"antegr.al/chatanium-bot/v1/src/Util/Log"
@@ -12,7 +14,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func RegisterGuild(client *discordgo.Session, database *db.PrismaClient, id, ownerID string) {
+func RegisterGuild(client *discordgo.Session, dbconn *sql.DB, queries *Internal.Queries, id, ownerID string) {
 	Log.Verbose.Printf("G:%s > Adding database...", id)
 
 	// Search owner username by owner id
@@ -26,134 +28,187 @@ func RegisterGuild(client *discordgo.Session, database *db.PrismaClient, id, own
 
 	// Username of the guild owner
 	ownerUsername := st.User.Username
-	Log.Verbose.Printf("G:%s > Found owner username: %s (%s)", id, ownerUsername, ownerID)
+	log.Printf("G:%s > Found owner username: %s (%s)", id, ownerUsername, ownerID)
 
-	// Database: insert user (Guild Owner)
-	InsertUser(database, ownerID, ownerUsername)
-
+	// Get guild information
 	g, err := client.Guild(id)
 	if err != nil {
 		Log.Error.Fatalf("G:%v > Failed to search guild: %v", id, err)
 	}
 
+	// Database: Begin transaction
+	tx, err := dbconn.Begin()
+	if err != nil {
+		Log.Error.Fatalf("G:%s > Failed to begin transaction: %v", id, err)
+	}
+	defer tx.Rollback()
+	qtx := queries.WithTx(tx)
+
+	// Database: insert user (Guild Owner)
+	if err := qtx.InsertUser(context.Background(), db.InsertUserParams{
+		ID:       util.Str2Int64(ownerID),
+		Username: ownerUsername,
+	}); err != nil {
+		Log.Error.Fatalf("G:%s > Failed to insert user: %v", id, err)
+		return
+	}
+
 	// Database: insert guild
-	InsertGuild(database, id, g.Name, ownerID)
+	qtx.InsertGuild(context.Background(), db.InsertGuildParams{
+		ID:      util.Str2Int64(id),
+		Name:    g.Name,
+		OwnerID: util.Str2Int64(ownerID),
+	})
 
 	// Database: insert member (Guild Owner)
-	InsertMember(database, ownerID, id, ownerUsername)
+	qtx.InsertGuildUser(context.Background(), db.InsertGuildUserParams{
+		UserID:  util.Str2Int64(ownerID),
+		GuildID: util.Str2Int64(id),
+	})
 
-	// insert each channels in guild
+	// Insert each channel in guild
 	var cntNewChannel int
 	for _, v := range g.Channels {
 		// Database: insert channel
-		isInserted := InsertChannel(database, v.ID, g.ID, v.Name, v.Topic)
-		if isInserted {
-			cntNewChannel++
+		err := qtx.InsertChannel(context.Background(), db.InsertChannelParams{
+			ID:      util.Str2Int64(v.ID),
+			GuildID: util.Str2Int64(g.ID),
+			Name:    v.Name,
+		})
+		if err != nil {
+			Log.Warn.Printf("G:%s | C:%s > Failed to insert channel: %v", g.ID, v.ID, err)
 		}
+
+		cntNewChannel++
 	}
 
-	// if new channels inserted
+	if err := tx.Commit(); err != nil {
+		Log.Warn.Printf("G:%s > Failed to commit transaction: %v", err)
+		return
+	}
+
+	// If new channels inserted
 	if cntNewChannel > 0 {
 		Log.Verbose.Printf("G:%s > Inserted %d new channels.", g.ID, cntNewChannel)
 		return
 	}
 
-	// if all channels already inserted
-	Log.Verbose.Printf("G:%s > All channels already exists.", g.ID)
+	// If all channels already inserted
+	Log.Verbose.Printf("G:%s > All channels already exist.", g.ID)
 }
 
-// Insert guild information to database
-func InsertGuild(database *db.PrismaClient, gid, name, ownerUid string) {
+// InsertUser inserts user information into the database
+func InsertUser(dbConn *sql.DB, uid, username string) {
 	ctx := context.Background()
+	queries := db.New(dbConn)
 
-	// Database Task: Upsert guild
-	Guild := db.Guilds
-	_, err := database.Guilds.FindUnique(
-		Guild.ID.Equals(util.StringToBigint(gid)),
-	).Exec(ctx)
+	// Check if user already exists
+	_, err := queries.GetUser(ctx, util.Str2Int64(uid))
 	if err == nil {
-		// Log.Verbose.Printf("G:%s > Guild already exists.", gid)
+		// User already exists
 		return
-	} else if !errors.Is(err, db.ErrNotFound) {
-		Log.Error.Fatalf("G:%s > Failed to find guild: %v", gid, err)
+	} else if err != sql.ErrNoRows {
+		log.Fatalf("Failed to find user: %v", err)
 	}
 
-	_, err = database.Guilds.CreateOne(
-		Guild.ID.Set(util.StringToBigint(gid)),
-		Guild.Name.Set(name),
-		Guild.Users.Link(db.Users.ID.Equals(util.StringToBigint(ownerUid))),
-	).Exec(ctx)
+	// Insert user
+	err = queries.InsertUser(ctx, db.InsertUserParams{
+		ID:        util.Str2Int64(uid),
+		Username:  username,
+		CreatedAt: time.Now(),
+	})
 	if err != nil {
-		Log.Error.Fatalf("Failed to insert guild: %v", err)
+		log.Fatalf("Failed to insert user: %v", err)
 	}
-
-	Log.Verbose.Printf("%s > Guild insert completed.", gid)
+	log.Printf("U:%s > User insert completed.", uid)
 }
 
-// Insert channel information to database
-func InsertChannel(database *db.PrismaClient, cid, gid, name, description string) bool {
+// InsertGuild inserts guild information into the database
+func InsertGuild(dbConn *sql.DB, gid, name, ownerUid string) {
 	ctx := context.Background()
+	queries := db.New(dbConn)
 
-	// Database Task: Insert channel
-	Channel := db.Channels
-	_, err := database.Channels.FindUnique(
-		Channel.ID.Equals(util.StringToBigint(cid)),
-	).Exec(ctx)
+	// Check if guild already exists
+	_, err := queries.GetGuild(ctx, util.Str2Int64(gid))
 	if err == nil {
-		// Log.Verbose.Printf("G:%s | C:%s > Channel already exists.", gid, cid)
-		return false
-	} else if !errors.Is(err, db.ErrNotFound) {
-		Log.Error.Fatalf("G:%s | C:%s > Failed to find guild: %v", gid, cid, err)
+		// Guild already exists
+		return
+	} else if err != sql.ErrNoRows {
+		log.Fatalf("Failed to find guild: %v", err)
 	}
 
-	_, err = database.Channels.CreateOne(
-		Channel.ID.Set(util.StringToBigint(cid)),
-		Channel.Name.Set(name),
-		Channel.CreatedAt.Set(time.Now()),
-		Channel.Guilds.Link(db.Guilds.ID.Equals(util.StringToBigint(gid))),
-	).Exec(ctx)
+	// Insert guild
+	err = queries.InsertGuild(ctx, db.InsertGuildParams{
+		ID:      util.Str2Int64(gid),
+		Name:    name,
+		OwnerID: util.Str2Int64(ownerUid),
+	})
 	if err != nil {
-		Log.Error.Fatalf("Failed to insert channel: %v", err)
+		log.Fatalf("Failed to insert guild: %v", err)
+	}
+	log.Printf("G:%s > Guild insert completed.", gid)
+}
+
+// InsertChannel inserts channel information into the database
+func InsertChannel(dbConn *sql.DB, cid, gid, name, description string) bool {
+	ctx := context.Background()
+	queries := db.New(dbConn)
+
+	// Check if channel already exists
+	_, err := queries.GetChannel(ctx, util.Str2Int64(cid))
+	if err == nil {
+		// Channel already exists
+		return false
+	} else if err != sql.ErrNoRows {
+		log.Fatalf("Failed to find channel: %v", err)
 	}
 
-	Log.Verbose.Printf("G:%s | C:%s > Channel insert completed.", gid, cid)
+	// Insert channel
+	err = queries.InsertChannel(ctx, db.InsertChannelParams{
+		ID:        util.Str2Int64(cid),
+		GuildID:   util.Str2Int64(gid),
+		Name:      name,
+		CreatedAt: time.Now(),
+	})
+	if err != nil {
+		log.Fatalf("Failed to insert channel: %v", err)
+	}
+	log.Printf("G:%s | C:%s > Channel insert completed.", gid, cid)
 	return true
 }
 
-// Insert user information to database.
-// (Member not equals to user. Member is a user who joined the guild)
-func InsertMember(database *db.PrismaClient, uid, gid, nickname string) bool {
+// InsertMember inserts member information into the database
+func InsertMember(dbConn *sql.DB, uid, gid, nickname string) bool {
 	ctx := context.Background()
-	// Database task: Check exists member in guild
-	Guilduser := db.Guildusers
-	_, err := database.Guildusers.FindFirst(
-		Guilduser.UserID.Equals(util.StringToBigint(uid)),
-		Guilduser.GuildID.Equals(util.StringToBigint(gid)),
-	).Exec(ctx)
+	queries := db.New(dbConn)
+
+	// Check if guild user already exists
+	_, err := queries.GetGuildUser(ctx, db.GetGuildUserParams{
+		UserID:  util.Str2Int64(uid),
+		GuildID: util.Str2Int64(gid),
+	})
 	if err == nil {
-		// Log.Verbose.Printf("G:%s > Guild user already exists.", uid)
+		// Guild user already exists
 		return false
-	} else if !errors.Is(err, db.ErrNotFound) {
-		Log.Error.Fatalf("G:%s > Failed to find guild user: %v", uid, err)
+	} else if err != sql.ErrNoRows {
+		log.Fatalf("Failed to find guild user: %v", err)
 	}
 
-	Log.Verbose.Printf("G:%s | U:%s > Adding member... (%s)", gid, uid, nickname)
+	log.Printf("G:%s | U:%s > Adding member... (%s)", gid, uid, nickname)
 
-	// Database Task: Insert user (Guild Member)
-	newUuid := uuid.New().String() // make new uuid
-	a, err := database.Guildusers.CreateOne(
-		Guilduser.CreatedAt.Set(time.Now()),
-		Guilduser.Nickname.Set(nickname),
-		Guilduser.UUID.Set(newUuid),
-		Guilduser.Guilds.Link(db.Guilds.ID.Equals(util.StringToBigint(gid))),
-		Guilduser.Users.Link(db.Users.ID.Equals(util.StringToBigint(uid))),
-	).Exec(ctx)
+	// Insert guild user
+	newUUID := uuid.New().String()
+	err = queries.InsertGuildUser(ctx, db.InsertGuildUserParams{
+		UUID:      newUUID,
+		GuildID:   util.Str2Int64(gid),
+		UserID:    util.Str2Int64(uid),
+		CreatedAt: time.Now(),
+		Nickname:  nickname,
+	})
 	if err != nil {
-		Log.Error.Fatalf("Failed to insert guild user: %v", err)
+		log.Fatalf("Failed to insert guild user: %v", err)
 	}
-
-	Log.Verbose.Printf("G:%v | U:%v > Registered! (%s)", a.GuildID, a.UserID, a.Nickname)
-
+	log.Printf("G:%s | U:%s > Member insert completed. (%s)", gid, uid, nickname)
 	return true
 }
 

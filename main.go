@@ -1,6 +1,9 @@
 package main
 
 import (
+	"os"
+
+	discord "antegr.al/chatanium-bot/v1/src/Backends/Discord"
 	Database "antegr.al/chatanium-bot/v1/src/Database"
 	util "antegr.al/chatanium-bot/v1/src/Util"
 	"antegr.al/chatanium-bot/v1/src/Util/Log"
@@ -17,11 +20,12 @@ func main() {
 	Log.Info.Println("Press CTRL+C to shutdown.")
 
 	// Ignite Database
-	database := Database.Database{}
+	database := Database.DB{}
 	database.Start()
 	defer database.Shutdown()
 
 	// Ignite Discord
+	discord.Start()
 	// Discord := Ignite.Discord{
 	// 	Database: database.Client,
 	// 	Token:    os.Getenv("DISCORD_TOKEN"),

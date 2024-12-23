@@ -1,5 +1,5 @@
 sqlc:
-	echo "Hello"
+	sqlc generate
 
 run:
 	go run main.go
