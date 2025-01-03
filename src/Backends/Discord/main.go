@@ -35,6 +35,7 @@ func (t *Backend) Start() {
 	moduleManager := module.ModuleManager{
 		Identifier: "discord",
 	}
+	moduleManager.Load()
 	moduleManager.Start()
 
 	t.client = client

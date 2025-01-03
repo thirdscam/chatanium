@@ -15,7 +15,7 @@ type Module struct {
 	Author     string
 	Repository string
 
-	enrtyPoint func()
+	entryPoint func()
 }
 
 // Getting module info
@@ -29,12 +29,13 @@ func (t *Module) Build(filename string, plugin *plugin.Plugin) bool {
 		return false
 	}
 
-	if _, ok := manifestSymbol.(int); !ok {
+	ManifestVersion, ok := manifestSymbol.(*int)
+	if !ok {
 		Log.Warn.Printf("Module@%s > %s (%s) > Plugin has invalid MANIFEST_VERSION type.", t.Backend, t.Name, filename)
 		return false
 	}
 
-	t.ManifestVersion = int(manifestSymbol.(int))
+	t.ManifestVersion = *ManifestVersion
 
 	// 2. Check NAME variable from plugin
 	nameSymbol, err := plugin.Lookup("NAME")
@@ -43,13 +44,13 @@ func (t *Module) Build(filename string, plugin *plugin.Plugin) bool {
 		return false
 	}
 
-	name, ok := nameSymbol.(string)
+	name, ok := nameSymbol.(*string)
 	if !ok {
 		Log.Warn.Printf("Module@%s > %s (%s) > Plugin has invalid NAME type.", t.Backend, t.Name, filename)
 		return false
 	}
 
-	t.Name = name
+	t.Name = *name
 
 	// 3. Check BACKEND variable from plugin
 	backendSymbol, err := plugin.Lookup("BACKEND")
@@ -58,14 +59,14 @@ func (t *Module) Build(filename string, plugin *plugin.Plugin) bool {
 		return false
 	}
 
-	backend, ok := backendSymbol.(string)
+	backend, ok := backendSymbol.(*string)
 	if !ok {
 		Log.Warn.Printf("Module@%s > %s (%s) > Plugin has invalid BACKEND type.", t.Backend, t.Name, filename)
 		return false
 	}
 
-	if backend != t.Backend {
-		Log.Warn.Printf("Module@%s > %s (%s) > Plugin is not for this backend (%s != %s).", t.Backend, t.Name, filename, backend, t.Backend)
+	if *backend != t.Backend {
+		Log.Warn.Printf("Module@%s > %s (%s) > Plugin is not for this backend (%s != %s).", t.Backend, t.Name, filename, *backend, t.Backend)
 		return false
 	}
 
@@ -76,13 +77,13 @@ func (t *Module) Build(filename string, plugin *plugin.Plugin) bool {
 		return false
 	}
 
-	version, ok := versionSymbol.(string)
+	version, ok := versionSymbol.(*string)
 	if !ok {
 		Log.Warn.Printf("Module@%s > %s (%s) > Plugin has invalid VERSION type.", t.Backend, t.Name, filename)
 		return false
 	}
 
-	t.Version = version
+	t.Version = *version
 
 	// 5. Check AUTHOR variable from plugin
 	authorSymbol, err := plugin.Lookup("AUTHOR")
@@ -91,13 +92,13 @@ func (t *Module) Build(filename string, plugin *plugin.Plugin) bool {
 		return false
 	}
 
-	author, ok := authorSymbol.(string)
+	author, ok := authorSymbol.(*string)
 	if !ok {
 		Log.Warn.Printf("Module@%s > %s (%s) > Plugin has invalid AUTHOR type.", t.Backend, t.Name, filename)
 		return false
 	}
 
-	t.Author = author
+	t.Author = *author
 
 	// 6. Check REPOSITORY variable from plugin
 	repositorySymbol, err := plugin.Lookup("REPOSITORY")
@@ -106,26 +107,28 @@ func (t *Module) Build(filename string, plugin *plugin.Plugin) bool {
 		return false
 	}
 
-	repository, ok := repositorySymbol.(string)
+	repository, ok := repositorySymbol.(*string)
 	if !ok {
 		Log.Warn.Printf("Module@%s > %s (%s) > Plugin has invalid REPOSITORY type.", t.Backend, t.Name, filename)
 		return false
 	}
 
-	t.Repository = repository
+	t.Repository = *repository
 
 	// 7. Check Entry point from plugin
 	startSymbol, err := plugin.Lookup("Start")
 	if err != nil {
 		Log.Warn.Printf("Module@%s > %s (%s) > Plugin does not export Start function: %v", t.Backend, t.Name, filename, err)
+		return false
 	}
 
-	if startFunc, ok := startSymbol.(func()); ok {
-		t.enrtyPoint = startFunc
-	} else {
+	startFunc, ok := startSymbol.(func())
+	if !ok {
 		Log.Warn.Printf("Module@%s > %s (%s) > Plugin has invalid Start function type.", t.Backend, t.Name, filename)
 		return false
 	}
+
+	t.entryPoint = startFunc
 
 	return true
 }
