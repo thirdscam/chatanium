@@ -82,7 +82,7 @@ func RegisterGuild(client *discordgo.Session, dbconn *sql.DB, queries *db.Querie
 	}
 
 	if err := tx.Commit(); err != nil {
-		Log.Warn.Printf("G:%s > Failed to commit transaction: %v", err)
+		Log.Warn.Printf("G:%s > Failed to commit transaction: %v", g.ID, err)
 		return
 	}
 
