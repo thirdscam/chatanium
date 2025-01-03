@@ -27,7 +27,7 @@ func RegisterGuild(client *discordgo.Session, dbconn *sql.DB, queries *db.Querie
 
 	// Username of the guild owner
 	ownerUsername := st.User.Username
-	log.Printf("G:%s > Found owner username: %s (%s)", id, ownerUsername, ownerID)
+	Log.Verbose.Printf("G:%s > Found owner username: U:%s (%s)", id, ownerID, ownerUsername)
 
 	// Get guild information
 	g, err := client.Guild(id)
@@ -45,36 +45,44 @@ func RegisterGuild(client *discordgo.Session, dbconn *sql.DB, queries *db.Querie
 
 	// Database: insert user (Guild Owner)
 	if err := qtx.InsertUser(context.Background(), db.InsertUserParams{
-		ID:       util.Str2Int64(ownerID),
-		Username: ownerUsername,
+		ID:        util.Str2Int64(ownerID),
+		Username:  ownerUsername,
+		CreatedAt: st.JoinedAt,
 	}); err != nil {
-		Log.Error.Fatalf("G:%s > Failed to insert user: %v", id, err)
+		Log.Error.Fatalf("G:%s > Failed to register guild (at INSERT_USER): %v", id, err)
 		return
 	}
 
 	// Database: insert guild
-	qtx.InsertGuild(context.Background(), db.InsertGuildParams{
+	if err := qtx.InsertGuild(context.Background(), db.InsertGuildParams{
 		ID:      util.Str2Int64(id),
 		Name:    g.Name,
 		OwnerID: util.Str2Int64(ownerID),
-	})
+	}); err != nil {
+		Log.Error.Fatalf("G:%s > Failed to register guild (at INSERT_GUILD): %v", id, err)
+		return
+	}
 
 	// Database: insert member (Guild Owner)
-	qtx.InsertGuildUser(context.Background(), db.InsertGuildUserParams{
-		UserID:  util.Str2Int64(ownerID),
-		GuildID: util.Str2Int64(id),
-	})
+	if err := qtx.InsertGuildUser(context.Background(), db.InsertGuildUserParams{
+		UserID:    util.Str2Int64(ownerID),
+		GuildID:   util.Str2Int64(id),
+		CreatedAt: time.Now(),
+	}); err != nil {
+		Log.Error.Fatalf("G:%s > Failed to insert user (at INSERT_MEMBER): %v", id, err)
+		return
+	}
 
 	// Insert each channel in guild
 	var cntNewChannel int
+	Log.Verbose.Printf("G:%s > Inserting channels... (%d channels)", g.ID, len(g.Channels))
 	for _, v := range g.Channels {
 		// Database: insert channel
-		err := qtx.InsertChannel(context.Background(), db.InsertChannelParams{
+		if err := qtx.InsertChannel(context.Background(), db.InsertChannelParams{
 			ID:      util.Str2Int64(v.ID),
 			GuildID: util.Str2Int64(g.ID),
 			Name:    v.Name,
-		})
-		if err != nil {
+		}); err != nil {
 			Log.Warn.Printf("G:%s | C:%s > Failed to insert channel: %v", g.ID, v.ID, err)
 		}
 
@@ -89,11 +97,10 @@ func RegisterGuild(client *discordgo.Session, dbconn *sql.DB, queries *db.Querie
 	// If new channels inserted
 	if cntNewChannel > 0 {
 		Log.Verbose.Printf("G:%s > Inserted %d new channels.", g.ID, cntNewChannel)
-		return
 	}
 
 	// If all channels already inserted
-	Log.Verbose.Printf("G:%s > All channels already exist.", g.ID)
+	Log.Verbose.Printf("G:%s > Done.", g.ID)
 }
 
 // InsertUser inserts user information into the database

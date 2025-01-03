@@ -15,6 +15,10 @@ import (
 // Initalize the environment variables from .env file
 func Init() {
 	mode := os.Getenv("LOG_MODE")
+	if mode == "" {
+		mode = "production"
+	}
+
 	switch mode {
 	case "production":
 		initLog(PRODUCTION_MODE)
@@ -39,10 +43,10 @@ var (
 )
 
 func initLog(level int) error {
-	Verbose = log.New(io.Discard, "[VERBOSE] ", log.Ldate|log.Ltime|log.Lshortfile)
+	Verbose = log.New(io.Discard, "[DEBG] ", log.Ldate|log.Ltime|log.Lshortfile)
 	Info = log.New(io.Discard, "[INFO] ", log.Ldate|log.Ltime|log.Lshortfile)
-	Warn = log.New(io.Discard, "[WARNING] ", log.Ldate|log.Ltime|log.Lshortfile)
-	Error = log.New(io.Discard, "[ERROR] ", log.Ldate|log.Ltime|log.Lshortfile)
+	Warn = log.New(io.Discard, "[WARN] ", log.Ldate|log.Ltime|log.Lshortfile)
+	Error = log.New(io.Discard, "[ERR!] ", log.Ldate|log.Ltime|log.Lshortfile)
 
 	date := time.Now().Format("2006-01-02_150405")
 	pwd, err := os.Getwd()
@@ -77,7 +81,7 @@ func initLog(level int) error {
 	}
 
 	if level >= 1 {
-		Error = log.New(os.Stderr, color.HiRedString("[ERROR] "), log.Ldate|log.Ltime)
+		Error = log.New(os.Stderr, color.HiRedString("[ERR!] "), log.Ldate|log.Ltime)
 		Error.SetOutput(Writer)
 	}
 
@@ -92,7 +96,7 @@ func initLog(level int) error {
 	}
 
 	if level >= 4 {
-		Verbose = log.New(os.Stdout, "[VERBOSE] ", log.Ldate|log.Ltime|log.Lshortfile)
+		Verbose = log.New(os.Stdout, "[DEBG] ", log.Ldate|log.Ltime|log.Lshortfile)
 		Info.Println("Verbose logging is enabled. Only use this mode for debugging.")
 		Verbose.SetOutput(Writer)
 	}

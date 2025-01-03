@@ -25,7 +25,7 @@ func (t *DB) Start() {
 	start := time.Now()
 
 	// Connect to database
-	db, err := sql.Open("sqlite3", ":memory:")
+	db, err := sql.Open("sqlite3", ":memory:") // TODO: change to config
 	if err != nil {
 		Log.Error.Fatalf("Failed to connect to database: %v", err)
 	}
@@ -37,6 +37,7 @@ func (t *DB) Start() {
 
 	Log.Info.Printf("Connected to database. (took %s)", time.Since(start).Truncate(time.Millisecond))
 	t.Queries = Internal.New(db)
+	t.Conn = db
 }
 
 // Close Database connection. must be called after all modules are shutdown.

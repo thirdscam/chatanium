@@ -2,5 +2,5 @@ package db_embed
 
 import _ "embed"
 
-//go:embed query.sql
+//go:embed schema.sql
 var DDL string

@@ -36,8 +36,8 @@ func CreateMessage(s *discordgo.Session, m *discordgo.MessageCreate, queries *db
 
 	// Database insert member (guild user)
 	InsertMember(queries, m.Author.ID, m.GuildID, m.Message.Member.Nick)
-	// Database Task: Insert message
 
+	// Database Task: Insert message
 	if err := queries.InsertMessage(context.Background(), db.InsertMessageParams{
 		MessageID: util.Str2Int64(m.ID),
 		Type:      int64(m.Type),

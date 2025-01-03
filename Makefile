@@ -1,5 +1,5 @@
 sqlc:
-	sqlc generate
+	sqlc generate -f database/sqlc.yaml
 
 run:
 	go run main.go
@@ -10,9 +10,7 @@ build:
 	GOOS=windows GOARCH=386 go build -o bin/chatanium-b$(date +%s)-windows-i386 main.go
 
 build_modules:
-	GOOS=freebsd GOARCH=386 go build -o bin/Hasher-b$(date +%s)-$(git rev-parse --short HEAD) ./src/Modules/...
-	GOOS=linux GOARCH=386 go build -o bin/chatanium-b$(date +%s)-linux-i386 ./src/Modules/...
-	GOOS=windows GOARCH=386 go build -o bin/chatanium-b$(date +%s)-windows-i386 ./src/Modules/...
+	go build -o ./modules -buildmode=plugin ./modules/**
 
 get_lines:
 	find . -name '*.go' -not -path "./src/Database/Internal/*" | xargs wc -l | sort -nr
