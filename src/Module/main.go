@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"plugin"
+	"sync"
 
 	"antegr.al/chatanium-bot/v1/src/Util/Log"
 )
@@ -69,7 +70,6 @@ func (t *ModuleManager) Load() {
 			continue
 		}
 		hash := hex.EncodeToString(h.Sum(nil))
-
 		t.Modules[hash] = module
 		Log.Info.Printf("Module@%s > %s (%s) > Inserted. (%s)", t.Identifier, module.Name, file.Name(), hash[:8])
 
@@ -79,11 +79,17 @@ func (t *ModuleManager) Load() {
 
 // Start all plugins
 func (t *ModuleManager) Start() {
+	var wg sync.WaitGroup
 	Log.Info.Printf("Module@%s > Starting %d plugins...", t.Identifier, len(t.Modules))
 	for hash, module := range t.Modules {
-		Log.Verbose.Printf("Starting plugin: %s (%s)...", module.Name, hash[:8])
-		go module.entryPoint()
+		wg.Add(1)
+		go func(m Module, h string) {
+			defer wg.Done()
+			Log.Verbose.Printf("Module@%s > Starting plugin: %s (%s)...", t.Identifier, m.Name, h[:8])
+			m.entryPoint()
+		}(module, hash)
 	}
+	wg.Wait()
 }
 
 func (t *ModuleManager) Shutdown() {
