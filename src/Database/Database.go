@@ -41,9 +41,9 @@ func (t *DB) Start() {
 
 // Close Database connection. must be called after all modules are shutdown.
 func (t *DB) Shutdown() {
-	// Log.Verbose.Println("Shutting down database connection...")
-	// if err := t.Client.Disconnect(); err != nil {
-	// 	Log.Error.Panicf("Cannot close database connection: %v", err)
-	// }
-	// Log.Verbose.Println("Successfully closed!")
+	Log.Verbose.Println("Shutting down database connection...")
+	if err := t.Conn.Close(); err != nil {
+		Log.Error.Panicf("Cannot close database connection: %v", err)
+	}
+	Log.Verbose.Println("Successfully closed!")
 }
