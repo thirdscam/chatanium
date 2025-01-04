@@ -76,7 +76,7 @@ func (t *CommandManager) Remove(cmd Commands) {
 	for schema := range cmd {
 		err := t.Client.ApplicationCommandDelete(t.Client.State.User.ID, t.GuildID, schema.ID)
 		if err != nil {
-			Log.Error.Fatalf("%s: Cannot delete '%v' command: %v", t.GuildID, schema.Name, err)
+			Log.Error.Fatalf("G:%s > Cannot delete '%v' command: %v", t.GuildID, schema.Name, err)
 		}
 	}
 
@@ -87,10 +87,10 @@ func (t *CommandManager) Remove(cmd Commands) {
 }
 
 // Remove all command from command manager.
-func (t *CommandManager) unloadCommand() {
-	Log.Verbose.Printf("G:%s > Unloading commands...", t.GuildID)
-	t.Remove(t.Commands)
-}
+// func (t *CommandManager) unloadCommand() {
+// 	Log.Verbose.Printf("G:%s > Unloading commands...", t.GuildID)
+// 	t.Remove(t.Commands)
+// }
 
 // Vaildate schema of commands.
 func (t *CommandManager) Vaildate() {
@@ -107,27 +107,45 @@ func (t *CommandManager) Vaildate() {
 	}
 
 	// 2. Get stored commands and registered commands.
-	remote := make(map[string]string, len(cmd))
-	for _, ac := range cmd {
-		remote[ac.Name] = fmt.Sprintf("%+v", ac)
+	remote := make([]string, len(cmd))
+	for _, schema := range cmd {
+		remote = append(remote, fmt.Sprintf("%s/%s", schema.Name, schema.Description))
 	}
 
-	local := make(map[string]string, len(t.Commands))
+	local := make([]string, len(t.Commands))
 	for schema := range t.Commands {
-		local[schema.Name] = fmt.Sprintf("%+v", schema)
+		local = append(local, fmt.Sprintf("%s/%s", schema.Name, schema.Description))
 	}
 
 	// 3. Compare stored commands and registered commands.
 	isSame := reflect.DeepEqual(remote, local)
+
 	if !isSame {
+		Log.Verbose.Printf("%+v", remote)
+		Log.Verbose.Printf("%+v", local)
 		Log.Warn.Printf("[Integrity] G:%s > Stored commands and registered commands are not same. Please check this guild commands.", t.GuildID)
 
 		// 3-1. If recovery mode is enabled, re-register commands.
 		if os.Getenv("CHATANIUM_RECOVERY") == "true" {
-			Log.Warn.Printf("[Integrity/Recovery] G:%s > Re-registering commands...", t.GuildID)
-			t.unloadCommand()
-			t.Add(t.Commands)
-			Log.Warn.Printf("[Integrity/Recovery] G:%s > Completed.", t.GuildID)
+			Log.Info.Printf("[Integrity/Recovery] G:%s > Re-registering commands...", t.GuildID)
+
+			//  3-1-1. Remove all commands
+			for _, ac := range cmd {
+				err := t.Client.ApplicationCommandDelete(t.Client.State.User.ID, t.GuildID, ac.ID)
+				if err != nil {
+					Log.Error.Fatalf("G:%s > Cannot delete '%v' command: %v", t.GuildID, ac.ID, err)
+				}
+			}
+
+			//  3-1-2. Register commands
+			for schema := range t.Commands {
+				schema, err := t.Client.ApplicationCommandCreate(t.Client.State.User.ID, t.GuildID, schema)
+				if err != nil {
+					Log.Error.Fatalf("%s: Cannot create '%v' command: %v", t.GuildID, schema.Name, err)
+				}
+			}
+
+			Log.Info.Printf("[Integrity/Recovery] G:%s > Completed.", t.GuildID)
 		}
 	}
 }

@@ -66,6 +66,7 @@ func (t *Guild) OnGuildCreated(id string) {
 
 	// 2. Start CommandManager
 	cmdMgrs.Start()
+	cmdMgrs.Vaildate() // Validate commands
 
 	// 3. Append to CommandManager storage
 	t.cmdMgrs = append(t.cmdMgrs, cmdMgrs)
