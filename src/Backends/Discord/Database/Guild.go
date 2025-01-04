@@ -116,8 +116,9 @@ func InsertUser(queries *db.Queries, uid, username string) {
 
 	// Insert user
 	err = queries.InsertUser(context.Background(), db.InsertUserParams{
-		ID:       util.Str2Int64(uid),
-		Username: username,
+		ID:        util.Str2Int64(uid),
+		Username:  username,
+		CreatedAt: time.Now(),
 	})
 	if err != nil {
 		Log.Error.Fatalf("Failed to insert user: %v", err)
