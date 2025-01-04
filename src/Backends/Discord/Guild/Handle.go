@@ -8,7 +8,6 @@ import (
 )
 
 // Handle all events from guild.
-// This function is used for entry point of discord backend.
 func Handle(client *discordgo.Session, db *Database.DB) {
 	/******************** Interfaces ********************/
 	// Slash := slash.Guild{

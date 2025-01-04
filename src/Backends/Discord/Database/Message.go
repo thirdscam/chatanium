@@ -92,7 +92,7 @@ func DeleteMessage(s *discordgo.Session, m *discordgo.MessageDelete, queries *db
 	msg, err := queries.GetMessage(context.Background(), util.Str2Int64(m.ID))
 
 	if errors.Is(err, sql.ErrNoRows) {
-		Log.Warn.Println("MessageIntegrityCheck: Cannot find message. may created when bot was offline.")
+		Log.Warn.Printf("[Integrity] M:%v: Cannot find message. may created when bot was offline.", m.ID)
 		Log.Warn.Printf("G:%v | C:%v > Cannot find message at M:%v", m.GuildID, m.ChannelID, m.ID)
 	} else if err != nil {
 		Log.Error.Printf("M:%s > Failed to find message: %v", m.ID, err)

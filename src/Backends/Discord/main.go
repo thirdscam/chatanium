@@ -4,6 +4,8 @@ import (
 	"strings"
 
 	"antegr.al/chatanium-bot/v1/src/Backends/Discord/Guild"
+	"antegr.al/chatanium-bot/v1/src/Backends/Discord/Interface/Slash"
+	"antegr.al/chatanium-bot/v1/src/Backends/Discord/Module"
 	"antegr.al/chatanium-bot/v1/src/Database"
 	module "antegr.al/chatanium-bot/v1/src/Module"
 	"antegr.al/chatanium-bot/v1/src/Util/Log"
@@ -22,6 +24,7 @@ func (t *Backend) Start() {
 	// Remove "Bot " prefix from token
 	t.Token = strings.TrimPrefix(t.Token, "Bot ")
 
+	// 1. Create Discord session
 	client, err := discordgo.New("Bot " + t.Token)
 	if err != nil {
 		Log.Error.Fatalf("Failed to create Discord session: %v", err)
@@ -31,15 +34,36 @@ func (t *Backend) Start() {
 		Log.Error.Fatalf("Failed to close Discord session: %v", err)
 	}
 
-	// Get modules
-	moduleManager := module.ModuleManager{
-		Identifier: "discord",
+	// 2. Get modules
+	moduleMgr := struct{ module.ModuleManager }{
+		ModuleManager: module.ModuleManager{
+			Identifier: "discord",
+		},
 	}
-	moduleManager.Load()
-	moduleManager.Start()
+	SlashGuildMgr := Slash.Guild{
+		Client: client,
+	}
 
+	// 3. Load modules
+	moduleMgr.Load()
+	CommandSet := Slash.Commands{}
+
+	// TODO(Feature): Improved command mapping (ACL, etc.)
+	for _, v := range moduleMgr.Modules {
+		module := Module.ConvertDiscordModule(v)
+		for k, v := range module.Commands {
+			CommandSet[k] = v
+		}
+	}
+
+	Slash.CommandMap = CommandSet
+
+	// 4. Start modules and Interface managers
+	moduleMgr.Start()
+	SlashGuildMgr.Start()
 	t.client = client
 
+	// 4. Start handler
 	Guild.Handle(client, t.Database)
 	// DM.Handle(client, db) // TODO: DM (Direct Message) Handler
 }

@@ -15,12 +15,16 @@ type Module struct {
 	Author     string
 	Repository string
 
+	Filename  string
+	RawPlugin *plugin.Plugin
+
 	entryPoint func()
 }
 
 // Getting module info
 func (t *Module) Build(filename string, plugin *plugin.Plugin) bool {
 	t.Name = "Unknown"
+	t.Filename = filename
 
 	// 1. Check MANIFEST_VERSION variable from plugin
 	manifestSymbol, err := plugin.Lookup("MANIFEST_VERSION")
@@ -129,6 +133,7 @@ func (t *Module) Build(filename string, plugin *plugin.Plugin) bool {
 	}
 
 	t.entryPoint = startFunc
+	t.RawPlugin = plugin
 
 	return true
 }

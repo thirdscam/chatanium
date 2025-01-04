@@ -10,7 +10,7 @@ build:
 	GOOS=windows GOARCH=386 go build -o bin/chatanium-b$(date +%s)-windows-i386 main.go
 
 build_modules:
-	go build -o ./modules -buildmode=plugin ./modules/**
+	rm ./modules/*.so && go build -o ./modules -buildmode=plugin ./modules/**
 
 get_lines:
 	find . -name '*.go' -not -path "./src/Database/Internal/*" | xargs wc -l | sort -nr
