@@ -35,26 +35,23 @@ func Handle(client *discordgo.Session, db *Database.DB) {
 
 	/******************** Chat Events ********************/
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
-		backendDB.CreateMessage(s, m, db.Queries)
-		if m.Author.Bot {
+		if m.Author.Bot || m.Author.ID == s.State.User.ID {
 			return
 		}
+		backendDB.CreateMessage(s, m, db.Queries)
 		Log.Verbose.Printf("G:%v | C:%v > A:CHAT_CREATE > %v: %v", m.GuildID, m.ChannelID, m.Author.Username, m.Content)
 	})
 
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.MessageUpdate) {
-		backendDB.UpdateMessage(s, m, db.Queries)
-		if m.Author.Bot {
+		if m.Author.ID == s.State.User.ID {
 			return
 		}
+		backendDB.UpdateMessage(s, m, db.Queries)
 		Log.Verbose.Printf("G:%v | C:%v > A:CHAT_UPDATE > M:%v (=> %v)", m.GuildID, m.ChannelID, m.Message.ID, m.Content)
 	})
 
 	client.AddHandler(func(s *discordgo.Session, m *discordgo.MessageDelete) {
 		backendDB.DeleteMessage(s, m, db.Queries)
-		if m.Author.Bot {
-			return
-		}
 		Log.Verbose.Printf("G:%v | C:%v > A:CHAT_DELETE > M:%v", m.GuildID, m.ChannelID, m.ID)
 	})
 

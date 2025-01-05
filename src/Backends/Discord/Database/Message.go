@@ -26,7 +26,7 @@ func GetMessageInfo(queries *db.Queries, mid string) *db.Message {
 }
 
 func CreateMessage(s *discordgo.Session, m *discordgo.MessageCreate, queries *db.Queries) {
-	// Ignore all messages created by the bot itself
+	// Ignore all messages created by the bot itself or other webhooks
 	if m.Author.ID == s.State.User.ID {
 		return
 	}

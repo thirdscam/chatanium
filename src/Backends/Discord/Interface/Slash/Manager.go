@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"slices"
 
 	"antegr.al/chatanium-bot/v1/src/Util/Log"
 	"github.com/bwmarrin/discordgo"
@@ -111,18 +112,18 @@ func (t *CommandManager) Vaildate() {
 	for _, schema := range cmd {
 		remote = append(remote, fmt.Sprintf("%s/%s", schema.Name, schema.Description))
 	}
+	slices.Sort(remote)
 
 	local := make([]string, len(t.Commands))
 	for schema := range t.Commands {
 		local = append(local, fmt.Sprintf("%s/%s", schema.Name, schema.Description))
 	}
+	slices.Sort(local)
 
 	// 3. Compare stored commands and registered commands.
 	isSame := reflect.DeepEqual(remote, local)
 
 	if !isSame {
-		Log.Verbose.Printf("%+v", remote)
-		Log.Verbose.Printf("%+v", local)
 		Log.Warn.Printf("[Integrity] G:%s > Stored commands and registered commands are not same. Please check this guild commands.", t.GuildID)
 
 		// 3-1. If recovery mode is enabled, re-register commands.
