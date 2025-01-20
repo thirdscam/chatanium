@@ -7,10 +7,10 @@ import (
 
 	_ "embed"
 
-	embed "antegr.al/chatanium-bot/v1/database"
-	"antegr.al/chatanium-bot/v1/src/Database/Internal"
-	"antegr.al/chatanium-bot/v1/src/Util/Log"
 	_ "github.com/mattn/go-sqlite3"
+	embed "github.com/thirdscam/chatanium/database"
+	"github.com/thirdscam/chatanium/src/Database/Internal"
+	"github.com/thirdscam/chatanium/src/Util/Log"
 )
 
 // Database is a struct that contains the database client.

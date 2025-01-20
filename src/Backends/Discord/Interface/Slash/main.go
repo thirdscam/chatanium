@@ -1,8 +1,8 @@
 package Slash
 
 import (
-	"antegr.al/chatanium-bot/v1/src/Util/Log"
 	"github.com/bwmarrin/discordgo"
+	"github.com/thirdscam/chatanium/src/Util/Log"
 )
 
 // Handle for slash commands when user input

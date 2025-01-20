@@ -3,13 +3,13 @@ package discord
 import (
 	"strings"
 
-	"antegr.al/chatanium-bot/v1/src/Backends/Discord/Guild"
-	"antegr.al/chatanium-bot/v1/src/Backends/Discord/Interface/Slash"
-	"antegr.al/chatanium-bot/v1/src/Backends/Discord/Module"
-	"antegr.al/chatanium-bot/v1/src/Database"
-	module "antegr.al/chatanium-bot/v1/src/Module"
-	"antegr.al/chatanium-bot/v1/src/Util/Log"
 	"github.com/bwmarrin/discordgo"
+	"github.com/thirdscam/chatanium/src/Backends/Discord/Guild"
+	"github.com/thirdscam/chatanium/src/Backends/Discord/Interface/Slash"
+	"github.com/thirdscam/chatanium/src/Backends/Discord/Module"
+	"github.com/thirdscam/chatanium/src/Database"
+	module "github.com/thirdscam/chatanium/src/Module"
+	"github.com/thirdscam/chatanium/src/Util/Log"
 )
 
 type Backend struct {

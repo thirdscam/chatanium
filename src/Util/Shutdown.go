@@ -6,7 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"antegr.al/chatanium-bot/v1/src/Util/Log"
+	"github.com/thirdscam/chatanium/src/Util/Log"
 )
 
 // this function is blocking (main) thread until a signal (Interrupt, Kill) is received.

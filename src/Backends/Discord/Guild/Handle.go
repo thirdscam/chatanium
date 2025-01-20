@@ -1,10 +1,10 @@
 package Guild
 
 import (
-	backendDB "antegr.al/chatanium-bot/v1/src/Backends/Discord/Database"
-	"antegr.al/chatanium-bot/v1/src/Database"
-	"antegr.al/chatanium-bot/v1/src/Util/Log"
 	"github.com/bwmarrin/discordgo"
+	backendDB "github.com/thirdscam/chatanium/src/Backends/Discord/Database"
+	"github.com/thirdscam/chatanium/src/Database"
+	"github.com/thirdscam/chatanium/src/Util/Log"
 )
 
 // Handle all events from guild.

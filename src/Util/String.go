@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math/big"
 
-	"antegr.al/chatanium-bot/v1/src/Util/Log"
+	"github.com/thirdscam/chatanium/src/Util/Log"
 )
 
 func Str2Int64(id string) int64 {

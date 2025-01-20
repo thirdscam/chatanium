@@ -3,7 +3,7 @@ package module
 import (
 	"plugin"
 
-	"antegr.al/chatanium-bot/v1/src/Util/Log"
+	"github.com/thirdscam/chatanium/src/Util/Log"
 )
 
 type Module struct {

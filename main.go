@@ -1,11 +1,11 @@
 package main
 
 import (
-	discord "antegr.al/chatanium-bot/v1/src/Backends/Discord"
-	Database "antegr.al/chatanium-bot/v1/src/Database"
-	util "antegr.al/chatanium-bot/v1/src/Util"
-	"antegr.al/chatanium-bot/v1/src/Util/Log"
 	_ "github.com/joho/godotenv/autoload"
+	discord "github.com/thirdscam/chatanium/src/Backends/Discord"
+	Database "github.com/thirdscam/chatanium/src/Database"
+	util "github.com/thirdscam/chatanium/src/Util"
+	"github.com/thirdscam/chatanium/src/Util/Log"
 )
 
 func main() {

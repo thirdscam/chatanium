@@ -5,11 +5,11 @@ import (
 	"database/sql"
 	"errors"
 
-	db "antegr.al/chatanium-bot/v1/src/Database/Internal"
-	util "antegr.al/chatanium-bot/v1/src/Util"
-	"antegr.al/chatanium-bot/v1/src/Util/Log"
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
+	db "github.com/thirdscam/chatanium/src/Database/Internal"
+	util "github.com/thirdscam/chatanium/src/Util"
+	"github.com/thirdscam/chatanium/src/Util/Log"
 )
 
 func GetMessageInfo(queries *db.Queries, mid string) *db.Message {

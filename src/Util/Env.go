@@ -3,8 +3,8 @@ package Util
 import (
 	"os"
 
-	"antegr.al/chatanium-bot/v1/src/Util/Log"
 	"github.com/joho/godotenv"
+	"github.com/thirdscam/chatanium/src/Util/Log"
 )
 
 func InitEnv() {

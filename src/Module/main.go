@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"plugin"
 
-	"antegr.al/chatanium-bot/v1/src/Util/Log"
+	"github.com/thirdscam/chatanium/src/Util/Log"
 )
 
 // ModuleManager is managed on a per-backend basis.

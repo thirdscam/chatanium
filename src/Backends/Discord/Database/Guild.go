@@ -6,11 +6,11 @@ import (
 	"log"
 	"time"
 
-	db "antegr.al/chatanium-bot/v1/src/Database/Internal"
-	util "antegr.al/chatanium-bot/v1/src/Util"
-	"antegr.al/chatanium-bot/v1/src/Util/Log"
 	"github.com/bwmarrin/discordgo"
 	"github.com/google/uuid"
+	db "github.com/thirdscam/chatanium/src/Database/Internal"
+	util "github.com/thirdscam/chatanium/src/Util"
+	"github.com/thirdscam/chatanium/src/Util/Log"
 )
 
 func RegisterGuild(client *discordgo.Session, dbconn *sql.DB, queries *db.Queries, id, ownerID string) {

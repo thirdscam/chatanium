@@ -1,9 +1,9 @@
 package Module
 
 import (
-	"antegr.al/chatanium-bot/v1/src/Backends/Discord/Interface/Slash"
-	module "antegr.al/chatanium-bot/v1/src/Module"
-	"antegr.al/chatanium-bot/v1/src/Util/Log"
+	"github.com/thirdscam/chatanium/src/Backends/Discord/Interface/Slash"
+	module "github.com/thirdscam/chatanium/src/Module"
+	"github.com/thirdscam/chatanium/src/Util/Log"
 )
 
 type DiscordModule struct {
