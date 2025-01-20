@@ -11,11 +11,12 @@ build:
 
 build_modules:
 	rm -rf ./modules/*.so > /dev/null 2>&1
-	for dir in $(shell find ./modules -type d -mindepth 1 -maxdepth 1); do \
+	for dir in $(shell find ./modules -mindepth 1 -maxdepth 1 -type l); do \
 		( \
 			cd $$dir && \
 			go1.23.2 build -buildmode=plugin -o $$(basename $$dir).so . && \
-			mv $$(basename $$dir).so ../$$(basename $$dir).so \
+			cd ./../.. && \
+			mv $$dir/$$(basename $$dir).so ./modules/$$(basename $$dir).so \
 		); \
 	done
 
