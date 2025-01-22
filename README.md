@@ -30,5 +30,8 @@ See how modules should actually be created.
 
 ### Module for Discord
 
-* **[chatanium-musicbot](https://github.com/thirdscam/chatanium-musicbot)**<br/>
+* **[thirdscam/chatanium-musicbot](https://github.com/thirdscam/chatanium-musicbot)**<br/>
 Allows you to play songs in voice channels.
+
+* **[thirdscam/chatanium-snowflake](https://github.com/thirdscam/chatanium-snowflake)**<br/>
+It tells you the creation time of a Snowflake ID generated in Discord.
