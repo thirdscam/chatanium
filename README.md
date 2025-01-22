@@ -1,1 +1,34 @@
-# Chatanium Bot Runtime
+<h1 align="center">Chatanium</h1>
+<p align="center">Scalable Chatbot Runtime</p><br/>
+
+Chatanium is a scalable chatbot runtime.
+
+You can create and load your own bot modules through various online chat providers such as Discord.<br/>
+In addition, you can add providers that are not directly related to chatting, such as running a web interface for bot management.
+
+## Design Architecture
+
+### Support for Dynamic Module Insertion
+
+It supports shared objects compiled based on Go plugins.<br/>
+
+Before running the bot runtime, users can create a `modules` folder at the top level of the repository folder and place modules there to run.
+In the future, we plan to support remote module insertion like gRPC to support various module insertion interfaces.
+
+### Customizable Interface
+
+To maximize compatibility, we did not use a unified interface between providers and modules.
+
+Therefore, you can use existing online chat provider libraries (e.g., [bwmarrin/discordgo](https://github.com/bwmarrin/discordgo) for Discord) as is.<br/>
+Currently, we have created a Discord backend using [bwmarrin/discordgo](https://github.com/bwmarrin/discordgo).
+
+Check out the modules below to see how modules are actually constructed.
+
+## Modules
+
+See how modules should actually be created.
+
+### Module for Discord
+
+* **[chatanium-musicbot](https://github.com/thirdscam/chatanium-musicbot)**<br/>
+Allows you to play songs in voice channels.
