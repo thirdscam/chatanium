@@ -1,5 +1,7 @@
 <h1 align="center">Chatanium</h1>
-<p align="center">Scalable Chatbot Runtime</p><br/>
+<p align="center">Scalable Chatbot Runtime</p>
+
+![Design Architecture](https://github.com/user-attachments/assets/cef88e8c-6689-4a08-8231-ec80d43bbea2)
 
 Chatanium is a scalable chatbot runtime.
 
