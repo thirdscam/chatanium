@@ -28,7 +28,7 @@ Check out the modules below to see how modules are actually constructed.
 
 See how modules should actually be created.
 
-### Module for Discord
+### for Discord
 
 * **[thirdscam/chatanium-musicbot](https://github.com/thirdscam/chatanium-musicbot)**<br/>
 Allows you to play songs in voice channels.
