@@ -26,7 +26,7 @@ func (t *CommandManager) Start() {
 
 	// 1. Register commands to discord (only schema. handler is not registered)
 	for schema := range t.Commands {
-		schema, err := t.Client.ApplicationCommandCreate(t.Client.State.User.ID, t.GuildID, schema)
+		_, err := t.Client.ApplicationCommandCreate(t.Client.State.User.ID, t.GuildID, schema)
 		if err != nil {
 			Log.Error.Fatalf("%s: Cannot create '%v' command: %v", t.GuildID, schema.Name, err)
 		}
