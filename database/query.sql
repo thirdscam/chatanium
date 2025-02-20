@@ -2,7 +2,7 @@
 SELECT id, username, created_at, deleted_at FROM users WHERE id = ?;
 
 -- name: InsertUser :exec
-INSERT INTO users (id, username, created_at)
+INSERT OR REPLACE INTO users (id, username, created_at)
 VALUES (?, ?, ?);
 
 -- name: GetGuild :one
