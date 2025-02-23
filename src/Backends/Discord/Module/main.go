@@ -24,6 +24,14 @@ func ConvertDiscordModule(m module.Module) DiscordModule {
 		Log.Warn.Printf("Module@%s > %s (%s) > Plugin has invalid DEFINE_SLASHCMD type.", m.Backend, m.Name, m.Filename)
 	}
 
+	if slashCmd == nil {
+		Log.Warn.Printf("Module@%s > %s (%s) > Plugin has no defined slash commands.", m.Backend, m.Name, m.Filename)
+		return DiscordModule{
+			Module:   m,
+			Commands: Slash.Commands{},
+		}
+	}
+
 	return DiscordModule{
 		Module:   m,
 		Commands: *slashCmd,
