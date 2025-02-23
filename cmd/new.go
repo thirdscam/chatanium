@@ -137,9 +137,9 @@ import (
 	"github.com/thirdscam/chatanium/src/Util/Log"
 )
 
-const MANIFEST_VERSION = 1
+var MANIFEST_VERSION = 1
 
-const (
+var (
 	NAME       = "%s"
 	BACKEND    = "%s"
 	VERSION    = "0.0.1"
@@ -149,7 +149,7 @@ const (
 
 func Start() {
 	// Add your code here!
-	Log.Info.Println("Hello World! I'm %s!")
+	Log.Info.Println("[%s] Hello World!")
 }
 `, moduleName, backendName, username, username, moduleName, moduleName)
 }
