@@ -1,9 +1,9 @@
 <h1 align="center">Chatanium</h1>
-<p align="center">Scalable Chatbot Runtime</p>
+<p align="center">Dynamic Chatbot Runtime</p>
 
 ![Design Architecture](https://github.com/user-attachments/assets/cef88e8c-6689-4a08-8231-ec80d43bbea2)
 
-Chatanium is a scalable chatbot runtime.
+Chatanium is a dynamic chatbot runtime.
 
 You can create and load your own bot modules through various online chat providers such as Discord.<br/>
 In addition, you can add providers that are not directly related to chatting, such as running a web interface for bot management.
