@@ -37,11 +37,20 @@ it will create a new module with the given name.`,
 			Log.Error.Fatalf("Error getting value from tui program!")
 		}
 
+		// Getting backendName/moduleName
 		backendName := "discord" // TODO: user can choose backend (maybe need to add more backends)
 		moduleName := m.GetValue()
 		if moduleName == "" {
 			Log.Error.Fatalf("Module name cannot be empty")
 		}
+
+		isVaildArgs := isVaildBackend(backendName) // Validate backend name
+		if !isVaildArgs {
+			Log.Error.Fatalf("Invalid backend name: %s", backendName)
+		}
+
+		Log.Info.Printf("Creating new module: %s", moduleName)
+		Log.Verbose.Printf("Backend: %s", backendName)
 
 		// Getting Username
 		user, err := user.Current()
@@ -54,13 +63,7 @@ it will create a new module with the given name.`,
 			Log.Error.Fatalf("Failed to get current user: username is empty")
 		}
 
-		isVaildArgs := isVaildBackend(backendName)
-		if !isVaildArgs {
-			Log.Error.Fatalf("Invalid backend name: %s", backendName)
-		}
-
-		Log.Info.Printf("Creating new module: %s", moduleName)
-		Log.Info.Printf("Backend: %s", backendName)
+		Log.Verbose.Printf("Current user: %s", userName)
 
 		// Get go version
 		GO_VERSION := runtime.Version()
@@ -103,7 +106,7 @@ it will create a new module with the given name.`,
 		}
 
 		f.Close()
-		Log.Info.Printf("Appended module dependencies to go.mod")
+		Log.Verbose.Printf("Appended module dependencies to go.mod")
 
 		// Create main.go with constants
 		if err := os.WriteFile(filepath.Join(modulePath, "main.go"), []byte(getMainGoCode(backendName, moduleName, userName)), 0o644); err != nil {
@@ -116,9 +119,13 @@ it will create a new module with the given name.`,
 		if err := execCmd.Run(); err != nil {
 			Log.Error.Fatalf("Failed to run go mod tidy: %v", err)
 		}
-		Log.Info.Printf("go mod tidy Completed")
+		Log.Verbose.Printf("go mod tidy Completed")
 
-		Log.Info.Printf("Successfully created module at %s!", modulePath)
+		Log.Info.Printf("Successfully created!")
+		Log.Info.Printf("Your module is located at: %s", modulePath)
+		Log.Info.Printf("")
+		Log.Info.Printf("* you can compile it with 'make build_modules'")
+		Log.Info.Printf("* run it with 'make start' or 'make run'")
 	},
 }
 
