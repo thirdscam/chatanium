@@ -76,16 +76,16 @@ it will create a new module with the given name.`,
 			Log.Error.Fatalf("Failed to create modules directory: %v", err)
 		}
 
-		// Check go compiler binary
-		goBinPath := filepath.Join(os.Getenv("GOPATH"), "bin", GO_VERSION)
-		if _, err := os.Stat(goBinPath); os.IsNotExist(err) {
-			Log.Error.Fatalf("Failed to find go compiler binary: %v", err)
-		}
+		// // Check go compiler binary
+		// goBinPath := filepath.Join(os.Getenv("GOPATH"), "bin", GO_VERSION)
+		// if _, err := os.Stat(goBinPath); os.IsNotExist(err) {
+		// 	Log.Error.Fatalf("Failed to find go compiler binary: %v", err)
+		// }
 
-		Log.Info.Printf("Found go compiler binary: %s", goBinPath)
+		// Log.Info.Printf("Found go compiler binary: %s", goBinPath)
 
 		// Create go.mod
-		execCmd := exec.Command(goBinPath, "mod", "init", fmt.Sprintf("github.com/%s/%s", userName, moduleName))
+		execCmd := exec.Command("go", "mod", "init", fmt.Sprintf("github.com/%s/%s", userName, moduleName))
 		execCmd.Dir = modulePath
 		if err := execCmd.Run(); err != nil {
 			Log.Error.Fatalf("Failed to create go.mod: %v", err)
@@ -111,7 +111,7 @@ it will create a new module with the given name.`,
 		}
 
 		// Run go mod tidy
-		execCmd = exec.Command(goBinPath, "mod", "tidy")
+		execCmd = exec.Command("go", "mod", "tidy")
 		execCmd.Dir = modulePath
 		if err := execCmd.Run(); err != nil {
 			Log.Error.Fatalf("Failed to run go mod tidy: %v", err)
