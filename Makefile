@@ -13,7 +13,18 @@ new_module:
 build:
 	GOOS=freebsd GOARCH=386 go build -o bin/chatanium-b$(date +%s)-freebsd-i386 main.go
 	GOOS=linux GOARCH=386 go build -o bin/chatanium-b$(date +%s)-linux-i386 main.go
-	GOOS=windows GOARCH=386 go build -o bin/chatanium-b$(date +%s)-windows-i386 main.go
+
+build_arm:
+	CGO_ENABLED=1 GOOS=linux GOARCH=arm64 go build -o bin/chatanium-b$(date +%s)-linux-arm64 main.go
+
+build_modules_arm:
+	rm -rf ./modules/*.so
+	for dir in $$(find ./modules -mindepth 1 -maxdepth 1 -type d -o -type l); do \
+		cd "$$dir" && \
+		CGO_ENABLED=1 GOOS=linux GOARCH=arm64 go build -buildmode=plugin -o "$$(basename $$dir).so" . && \
+		cd ../.. && \
+		mv "$$dir/$$(basename $$dir).so" "./modules/$$(basename $$dir).so"; \
+	done
 
 update_deps:
 	go get -u
