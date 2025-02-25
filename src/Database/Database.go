@@ -7,10 +7,10 @@ import (
 
 	_ "embed"
 
-	_ "github.com/mattn/go-sqlite3"
 	embed "github.com/thirdscam/chatanium/database"
 	"github.com/thirdscam/chatanium/src/Database/Internal"
 	"github.com/thirdscam/chatanium/src/Util/Log"
+	_ "modernc.org/sqlite"
 )
 
 // Database is a struct that contains the database client.
@@ -25,7 +25,7 @@ func (t *DB) Start() {
 	start := time.Now()
 
 	// Connect to database
-	db, err := sql.Open("sqlite3", ":memory:") // TODO: change to config
+	db, err := sql.Open("sqlite", ":memory:") // TODO: change to config
 	if err != nil {
 		Log.Error.Fatalf("Failed to connect to database: %v", err)
 	}
