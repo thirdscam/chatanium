@@ -15,6 +15,17 @@ build:
 	GOOS=linux GOARCH=386 go build -o bin/chatanium-b$(date +%s)-linux-i386 main.go
 	GOOS=windows GOARCH=386 go build -o bin/chatanium-b$(date +%s)-windows-i386 main.go
 
+update_deps:
+	go get -u
+	go mod tidy
+	for dir in $(find ./modules -mindepth 1 -maxdepth 1 -type d -o -type l); do \
+		cd "$$dir" && \
+		go get -u && \
+		go mod tidy && \
+		cd ..; \
+	done
+	make build_modules
+
 build_modules:
 	rm -rf ./modules/*.so
 	for dir in $$(find ./modules -mindepth 1 -maxdepth 1 -type d -o -type l); do \
