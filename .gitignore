@@ -10,3 +10,4 @@ __debug_bin
 *.dca
 /.*
 /bin
+/plugin-impl-example
