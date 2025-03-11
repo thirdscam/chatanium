@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package discord;
+import "google/protobuf/empty.proto";
+
+option go_package = "./proto";
+
+message MessageRequest {
+    string guild_id = 1;
+    string channel_id = 2;
+    string message = 3;
+}
+
+message VoiceChannelRequest {
+    string guild_id = 1;
+    string channel_id = 2;
+}
+
+// The DiscordModule service defines Discord-specific module interface
+service DiscordModule {
+    // Event hooks
+    rpc OnStart(google.protobuf.Empty) returns (google.protobuf.Empty);
+    rpc OnMessage(google.protobuf.Empty) returns (google.protobuf.Empty);
+}
+
+// The DiscordRuntime service defines Discord-specific runtime interface
+service DiscordRuntime {
+    // Message operations
+    rpc SendMessage(MessageRequest) returns (google.protobuf.Empty);
+    
+    // Voice operations
+    rpc JoinVoiceChannel(VoiceChannelRequest) returns (google.protobuf.Empty);
+    rpc DisconnectVoiceChannel(google.protobuf.Empty) returns (google.protobuf.Empty);
+}

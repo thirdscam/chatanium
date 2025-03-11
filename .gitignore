@@ -11,3 +11,4 @@ __debug_bin
 /.*
 /bin
 /plugin-impl-example
+*.pb.go

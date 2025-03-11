@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package proto;
+import "google/protobuf/empty.proto";
+
+option go_package = "./proto";
+
+message ModuleInfoResponse {
+    int32 manifest_version = 1;
+    string name = 2;
+    string backend = 3;
+    string version = 4;
+    string author = 5;
+    string repository = 6;
+}
+
+message Empty {}
+
+message VersionResponse {
+    string version = 1;
+}
+
+// The Module service defines the main module interface
+service Module {
+    // GetModuleInfo retrieves the module metadata
+    rpc GetModuleInfo(Empty) returns (ModuleInfoResponse);
+
+    // Start launches the module
+    rpc Start(Empty) returns (Empty);
+}
+
+// The Runtime service defines the interface that modules can call
+service Runtime {
+    // GetVersion retrieves the runtime version
+    rpc GetVersion(Empty) returns (VersionResponse);
+}

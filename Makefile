@@ -1,6 +1,9 @@
 sqlc:
 	sqlc generate -f database/sqlc.yaml
 
+buf:
+	cd ./src/Module/proto && buf generate
+
 run:
 	go run main.go start
 
